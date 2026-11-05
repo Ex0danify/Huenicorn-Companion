@@ -85,11 +85,14 @@ private slots:
     f.model->setChannelRect(0, 0.1, 0.2, 0.4, 0.6);
     QTRY_COMPARE(f.api.count("PUT", "/api/setChannelUV/0"), 2);
 
-    const auto first = QJsonDocument::fromJson(f.api.requests[f.api.requests.size() - 2].body).object();
-    const auto second = QJsonDocument::fromJson(f.api.requests.last().body).object();
-    QCOMPARE(first.value("type").toInt(), 0);
-    QCOMPARE(second.value("type").toInt(), 3);
-    QCOMPARE(second.value("x").toDouble(), 0.4);
+    // Both corners go out concurrently, so arrival order is not defined
+    QMap<int, QJsonObject> corners;
+    for(int i = f.api.requests.size() - 2; i < f.api.requests.size(); i++){
+      const auto body = QJsonDocument::fromJson(f.api.requests[i].body).object();
+      corners.insert(body.value("type").toInt(), body);
+    }
+    QCOMPARE(corners.keys(), (QList<int>{0, 3}));
+    QCOMPARE(corners.value(3).value("x").toDouble(), 0.4);
 
     QTRY_VERIFY(f.model->dirty());
     const auto c = f.channel(0);
