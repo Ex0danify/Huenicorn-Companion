@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(HuenicornQt VERSION 0.1.0 LANGUAGES CXX)
+project(HuenicornQt VERSION 0.1.0 LANGUAGES CXX) # x-release-please-version
 
 option(BUILD_TESTS "Build tests" ON)
 
