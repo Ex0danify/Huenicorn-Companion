@@ -46,9 +46,9 @@ void ApiClient::get(const QString& path, Callback callback, int timeoutMs)
 }
 
 
-void ApiClient::put(const QString& path, const QJsonValue& body, Callback callback)
+void ApiClient::put(const QString& path, const QJsonValue& body, Callback callback, int timeoutMs)
 {
-  dispatch(m_network.put(makeRequest(path, true), encodeBody(body)), std::move(callback));
+  dispatch(m_network.put(makeRequest(path, true, timeoutMs), encodeBody(body)), std::move(callback));
 }
 
 
