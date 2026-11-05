@@ -20,7 +20,7 @@ set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
 
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_SECTION utils)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "qml6-module-qtquick, qml6-module-qtquick-window")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "qml6-module-qtquick, qml6-module-qtquick-window, qml6-module-qtqml-workerscript")
 set(CPACK_DEBIAN_PACKAGE_SUGGESTS huenicorn)
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 

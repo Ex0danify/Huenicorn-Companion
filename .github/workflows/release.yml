@@ -23,11 +23,11 @@ jobs:
           - name: ubuntu-24.04
             image: ubuntu:24.04
             generators: DEB
-            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
           - name: debian-13
             image: debian:13
             generators: DEB
-            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies

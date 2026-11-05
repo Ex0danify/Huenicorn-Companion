@@ -19,10 +19,10 @@ jobs:
             deps: dnf install -y git cmake gcc-c++ make qt6-qtbase-devel qt6-qtdeclarative-devel mesa-libGL-devel
           - name: ubuntu-24.04
             image: ubuntu:24.04
-            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
           - name: debian-13
             image: debian:13
-            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
           - name: arch
             image: archlinux:latest
             deps: pacman -Syu --noconfirm git cmake gcc make qt6-base qt6-declarative
