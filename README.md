@@ -88,6 +88,18 @@ settings, next to its own binary, or on your `PATH`.
 Huenicorn GUI is a companion to [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn) by
 [openjowelsofts](https://gitlab.com/openjowelsofts).
 
+## Releases
+
+Versions are managed by [release-please](https://github.com/googleapis/release-please) from Conventional Commit messages on `master`. It keeps a release PR open that bumps the version in `CMakeLists.txt`. Merging it creates the `vX.Y.Z` tag and the GitHub release, and the tag builds and tests the packages and attaches them with a `SHA256SUMS` file and a build provenance attestation:
+
+    huenicorn-qt-X.Y.Z-fedora.rpm
+    huenicorn-qt-X.Y.Z-ubuntu-24.04.deb
+    huenicorn-qt-X.Y.Z-debian-13.deb
+    huenicorn-qt-X.Y.Z-arch.pkg.tar.zst
+    huenicorn-qt-X.Y.Z-linux-x86_64.tar.gz
+
+Build a package locally with `cpack -G RPM` (or `DEB`, `TGZ`) in the build directory. The Arch package is built from `packaging/arch/PKGBUILD`.
+
 ## License
 
 GPLv3, see [LICENSE.txt](LICENSE.txt).

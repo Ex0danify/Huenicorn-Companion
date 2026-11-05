@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(HuenicornQt VERSION 0.1.0 LANGUAGES CXX)
+project(HuenicornQt VERSION 0.1.0 LANGUAGES CXX) # x-release-please-version
 
 option(BUILD_TESTS "Build tests" ON)
 
@@ -24,6 +24,8 @@ add_subdirectory(src/app)
 
 install(FILES resources/huenicorn-qt.desktop DESTINATION share/applications)
 install(FILES resources/logo.svg DESTINATION share/icons/hicolor/scalable/apps RENAME huenicorn-qt.svg)
+
+include(cmake/Packaging.cmake)
 
 if(BUILD_TESTS)
   enable_testing()
