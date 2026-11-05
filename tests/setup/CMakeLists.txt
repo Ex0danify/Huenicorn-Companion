@@ -1,0 +1,3 @@
+add_executable(TestSetupController TestSetupController.cpp)
+target_link_libraries(TestSetupController PRIVATE huenicorn_setup test_support)
+add_test(NAME SetupController COMMAND TestSetupController)

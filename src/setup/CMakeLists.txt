@@ -1,0 +1,2 @@
+add_library(huenicorn_setup STATIC SetupController.cpp)
+target_link_libraries(huenicorn_setup PUBLIC huenicorn_api huenicorn_daemon)
