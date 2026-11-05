@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: package (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: fedora
+            image: fedora:44
+            generators: "RPM;TGZ"
+            deps: dnf install -y git cmake gcc-c++ make rpm-build qt6-qtbase-devel qt6-qtdeclarative-devel mesa-libGL-devel
+          - name: ubuntu-24.04
+            image: ubuntu:24.04
+            generators: DEB
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window
+          - name: debian-13
+            image: debian:13
+            generators: DEB
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: ${{ matrix.deps }}
+      - name: Check tag matches project version
+        run: |
+          version=$(sed -n 's/^project(HuenicornQt VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          test "v$version" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} does not match CMake version $version"; exit 1; }
+      - name: Build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+          cmake --build build -j"$(nproc)"
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Package
+        run: |
+          cd build
+          cpack -G "${{ matrix.generators }}"
+          mkdir ../dist
+          for f in *.rpm *.deb *.tar.gz; do
+            [ -e "$f" ] || continue
+            case "$f" in
+              *.deb) cp "$f" "../dist/huenicorn-qt-${GITHUB_REF_NAME#v}-${{ matrix.name }}.deb" ;;
+              *.rpm) cp "$f" "../dist/huenicorn-qt-${GITHUB_REF_NAME#v}-${{ matrix.name }}.rpm" ;;
+              *) cp "$f" ../dist/ ;;
+            esac
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.name }}
+          path: dist/*
+
+  package-arch:
+    name: package (arch)
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: pacman -Syu --noconfirm git base-devel cmake qt6-base qt6-declarative
+      - uses: actions/checkout@v4
+      - name: Build package
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          useradd -m builder
+          mkdir /home/builder/pkg
+          cp packaging/arch/PKGBUILD /home/builder/pkg/
+          tar czf "/home/builder/pkg/huenicorn-qt-$version.tar.gz" \
+            --exclude=.git --exclude=build --transform "s,^\./,huenicorn-qt-$version/," .
+          chown -R builder /home/builder/pkg
+          su builder -c "cd ~/pkg && HUENICORN_VERSION=$version makepkg -f --noconfirm"
+          mkdir dist
+          cp /home/builder/pkg/*.pkg.tar.zst "dist/huenicorn-qt-$version-arch.pkg.tar.zst"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-arch
+          path: dist/*
+
+  release:
+    needs: [package, package-arch]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
