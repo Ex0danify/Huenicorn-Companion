@@ -35,7 +35,7 @@ jobs:
       - name: Check tag matches project version
         run: |
           version=$(sed -n 's/^project(HuenicornQt VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
-          test "v$version" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} does not match CMake version $version"; exit 1; }
+          test "v$version" = "${GITHUB_REF_NAME%%-*}" || { echo "tag ${GITHUB_REF_NAME} does not match CMake version $version"; exit 1; }
       - name: Build
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
@@ -73,6 +73,7 @@ jobs:
       - name: Build package
         run: |
           version=${GITHUB_REF_NAME#v}
+          version=${version%%-*}
           useradd -m builder
           mkdir /home/builder/pkg
           cp packaging/arch/PKGBUILD /home/builder/pkg/
@@ -81,7 +82,7 @@ jobs:
           chown -R builder /home/builder/pkg
           su builder -c "cd ~/pkg && HUENICORN_VERSION=$version makepkg -f --noconfirm"
           mkdir dist
-          cp /home/builder/pkg/*.pkg.tar.zst "dist/huenicorn-qt-$version-arch.pkg.tar.zst"
+          cp /home/builder/pkg/*.pkg.tar.zst "dist/huenicorn-qt-${GITHUB_REF_NAME#v}-arch.pkg.tar.zst"
       - uses: actions/upload-artifact@v4
         with:
           name: dist-arch
@@ -103,4 +104,6 @@ jobs:
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+        run: |
+          case "$GITHUB_REF_NAME" in *-*) prerelease=--prerelease ;; esac
+          gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes $prerelease
