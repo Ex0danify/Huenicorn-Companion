@@ -19,6 +19,9 @@ public:
   TrayApp(DaemonController& controller, Settings& settings, QObject* parent = nullptr);
 
   void show();
+  void quit();
+
+  void notify(const QString& title, const QString& message);
 
   // Runs before quitting and must call the continuation when it is safe to go on.
   // Lets the composition root persist unsaved work without the tray knowing about it.
@@ -34,7 +37,6 @@ private:
   void refresh();
   void openWebConfigurator();
   void chooseDaemon();
-  void quit();
   void finishQuit();
 
   Settings& m_settings;

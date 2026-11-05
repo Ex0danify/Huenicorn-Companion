@@ -23,6 +23,8 @@ TrayApp::TrayApp(DaemonController& controller, Settings& settings, QObject* pare
     }
   });
 
+  connect(&m_tray, &QSystemTrayIcon::messageClicked, this, &TrayApp::configuratorRequested);
+
   connect(&m_controller, &DaemonController::stateChanged, this, [this](DaemonController::State state){
     refresh();
     if(state == DaemonController::State::Error){
@@ -48,6 +50,12 @@ void TrayApp::show()
       }
     });
   }
+}
+
+
+void TrayApp::notify(const QString& title, const QString& message)
+{
+  m_tray.showMessage(title, message, QSystemTrayIcon::Information, 10000);
 }
 
 
