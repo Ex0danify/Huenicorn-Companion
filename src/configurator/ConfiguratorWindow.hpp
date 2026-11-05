@@ -4,6 +4,7 @@
 #include <QQmlApplicationEngine>
 
 #include "configurator/ConfiguratorModel.hpp"
+#include "updater/UpdateController.hpp"
 
 class QQuickWindow;
 
@@ -13,7 +14,7 @@ class ConfiguratorWindow : public QObject
   Q_OBJECT
 
 public:
-  explicit ConfiguratorWindow(DaemonController& controller, QObject* parent = nullptr);
+  ConfiguratorWindow(DaemonController& controller, UpdateController& updater, QObject* parent = nullptr);
 
   ConfiguratorModel& model();
   QQuickWindow* window();

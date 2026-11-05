@@ -169,5 +169,9 @@ Flickable {
                 }
             }
         }
+
+        UpdateCard {
+            width: parent.width
+        }
     }
 }
