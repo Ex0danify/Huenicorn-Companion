@@ -90,7 +90,7 @@ Huenicorn GUI is a companion to [Huenicorn](https://gitlab.com/openjowelsofts/hu
 
 ## Releases
 
-Pushing a tag `vX.Y.Z` that matches the version in `CMakeLists.txt` builds and tests the app, then publishes these assets with a `SHA256SUMS` file to GitHub Releases:
+Versions are managed by [release-please](https://github.com/googleapis/release-please) from Conventional Commit messages on `master`. It keeps a release PR open that bumps the version in `CMakeLists.txt`. Merging it creates the `vX.Y.Z` tag and the GitHub release, and the tag builds and tests the packages and attaches them with a `SHA256SUMS` file and a build provenance attestation:
 
     huenicorn-qt-X.Y.Z-fedora.rpm
     huenicorn-qt-X.Y.Z-ubuntu-24.04.deb
