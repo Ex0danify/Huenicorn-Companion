@@ -4,12 +4,13 @@ cmake_minimum_required(VERSION 3.16)
 # A module may include itself and the modules listed after its name.
 set(ALLOWED_api "")
 set(ALLOWED_settings "")
+set(ALLOWED_updater "")
 set(ALLOWED_daemon "api")
 set(ALLOWED_tray "daemon;settings")
-set(ALLOWED_configurator "api;daemon")
-set(ALLOWED_app "api;daemon;settings;tray;configurator")
+set(ALLOWED_configurator "api;daemon;updater")
+set(ALLOWED_app "api;daemon;settings;updater;tray;configurator")
 
-set(MODULES api settings daemon tray configurator app)
+set(MODULES api settings updater daemon tray configurator app)
 set(violations "")
 
 foreach(module ${MODULES})

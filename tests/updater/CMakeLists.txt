@@ -1,0 +1,7 @@
+add_executable(TestUpdaterRules TestUpdaterRules.cpp)
+target_link_libraries(TestUpdaterRules PRIVATE huenicorn_updater Qt6::Test)
+add_test(NAME UpdaterRules COMMAND TestUpdaterRules)
+
+add_executable(TestUpdateController TestUpdateController.cpp)
+target_link_libraries(TestUpdateController PRIVATE huenicorn_updater test_support)
+add_test(NAME UpdateController COMMAND TestUpdateController)
