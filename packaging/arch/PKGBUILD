@@ -1,0 +1,23 @@
+# Built in CI from a source tarball of the checked out tag
+pkgname=huenicorn-qt
+pkgver=${HUENICORN_VERSION:?set HUENICORN_VERSION}
+pkgrel=1
+pkgdesc='System tray controller and configurator for the Huenicorn daemon'
+arch=(x86_64)
+url='https://github.com/Ex0danify/Huenicorn-GUI'
+license=(GPL-3.0-only)
+depends=(qt6-base qt6-declarative)
+optdepends=('huenicorn: the daemon this app controls')
+makedepends=(cmake)
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=(SKIP)
+
+build() {
+  cmake -S "$pkgname-$pkgver" -B build -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTS=OFF
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+}
