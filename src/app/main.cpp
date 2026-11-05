@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   app.setApplicationName("huenicorn-qt");
+  app.setApplicationVersion(HUENICORN_QT_VERSION);
   app.setOrganizationName("huenicorn");
   app.setDesktopFileName("huenicorn-qt");
   app.setQuitOnLastWindowClosed(false);

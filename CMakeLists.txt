@@ -25,6 +25,8 @@ add_subdirectory(src/app)
 install(FILES resources/huenicorn-qt.desktop DESTINATION share/applications)
 install(FILES resources/logo.svg DESTINATION share/icons/hicolor/scalable/apps RENAME huenicorn-qt.svg)
 
+include(cmake/Packaging.cmake)
+
 if(BUILD_TESTS)
   enable_testing()
   find_package(Qt6 REQUIRED COMPONENTS Test)

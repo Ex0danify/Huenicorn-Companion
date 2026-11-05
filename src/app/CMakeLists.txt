@@ -6,6 +6,8 @@ target_link_libraries(huenicorn-qt PRIVATE
   huenicorn_settings
   huenicorn_daemon
 )
+target_compile_definitions(huenicorn-qt PRIVATE HUENICORN_QT_VERSION="${PROJECT_VERSION}")
+
 # Keep the binary at the build root, where it has always been
 set_target_properties(huenicorn-qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
