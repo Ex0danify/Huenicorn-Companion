@@ -86,6 +86,42 @@ void Settings::setStopDaemonOnQuit(bool enabled)
 }
 
 
+bool Settings::checkUpdatesOnStart() const
+{
+  return store().value("checkUpdatesOnStart", true).toBool();
+}
+
+
+void Settings::setCheckUpdatesOnStart(bool enabled)
+{
+  store().setValue("checkUpdatesOnStart", enabled);
+}
+
+
+QDateTime Settings::lastUpdateCheck() const
+{
+  return store().value("lastUpdateCheck").toDateTime();
+}
+
+
+void Settings::setLastUpdateCheck(const QDateTime& when)
+{
+  store().setValue("lastUpdateCheck", when);
+}
+
+
+QString Settings::skippedUpdateVersion() const
+{
+  return store().value("skippedUpdateVersion").toString();
+}
+
+
+void Settings::setSkippedUpdateVersion(const QString& version)
+{
+  store().setValue("skippedUpdateVersion", version);
+}
+
+
 QString Settings::resolvedDaemonPath() const
 {
   const auto configured = daemonPath();

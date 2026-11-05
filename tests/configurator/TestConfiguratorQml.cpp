@@ -27,7 +27,8 @@ private slots:
       DaemonController controller;
       controller.setPort(api.port());
       controller.setPollIntervalMs(100);
-      ConfiguratorWindow configurator(controller);
+      UpdateController updater("0.1.0");
+      ConfiguratorWindow configurator(controller, updater);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);

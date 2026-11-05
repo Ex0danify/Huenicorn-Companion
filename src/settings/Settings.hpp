@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDateTime>
 #include <QString>
 
 // Thin QSettings wrapper so the rest of the app never touches keys directly.
@@ -18,6 +19,15 @@ public:
 
   bool stopDaemonOnQuit() const;
   void setStopDaemonOnQuit(bool enabled);
+
+  bool checkUpdatesOnStart() const;
+  void setCheckUpdatesOnStart(bool enabled);
+
+  QDateTime lastUpdateCheck() const;
+  void setLastUpdateCheck(const QDateTime& when);
+
+  QString skippedUpdateVersion() const;
+  void setSkippedUpdateVersion(const QString& version);
 
   // Configured path, or the first "huenicorn" found next to us or on PATH
   QString resolvedDaemonPath() const;

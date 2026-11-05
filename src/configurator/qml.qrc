@@ -16,5 +16,6 @@
     <file>qml/pages/LightsPage.qml</file>
     <file>qml/pages/SettingsPage.qml</file>
     <file>qml/pages/SyncPage.qml</file>
+    <file>qml/pages/UpdateCard.qml</file>
   </qresource>
 </RCC>
