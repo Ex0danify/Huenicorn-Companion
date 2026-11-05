@@ -110,6 +110,12 @@ void DaemonController::setStopTimeoutMs(int ms)
 }
 
 
+void DaemonController::setPollingPaused(bool paused)
+{
+  m_pollPaused = paused;
+}
+
+
 void DaemonController::beginMonitoring()
 {
   m_pollTimer.start();
@@ -206,6 +212,10 @@ void DaemonController::fail(const QString& message)
 
 void DaemonController::poll()
 {
+  if(m_pollPaused){
+    return;
+  }
+
   m_api.setBaseUrl(baseUrl());
   m_api.get("/api/version", [this](bool ok, const QJsonDocument& doc){
     onPollReply(ok, ok ? doc.object().value("version").toString() : QString());

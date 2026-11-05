@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QByteArray>
+#include <QElapsedTimer>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -37,6 +38,21 @@ public:
   QList<Request> requests;
   int stopRequests{0};
   bool failSaves{false};
+
+  // Setup mode mimics a daemon without a bridge: a reduced API, everything else is a 404
+  bool setupMode{false};
+  QStringList detectedBridges{"192.168.1.20"};
+  QString knownBridge{"192.168.1.20"};
+  QString knownUser{"known-user"};
+  QString pairError{"link button not pressed"};
+  int linkButtonAfter{0};         // register attempts that fail before the button counts as pressed
+  int normalModeAfter{0};         // webUIStatus requests answered with 404 once setup finished
+  int registerAttempts{0};
+  bool setupFinished{false};
+  // The real daemon crashes on a request that lands while its setup server stops
+  int shutdownWindowMs{0};
+  bool requestedDuringShutdown{false};
+  bool versionPolledDuringShutdown{false};
 
   int count(const QString& method, const QString& pathPrefix) const
   {
@@ -120,10 +136,15 @@ private:
     Request request{parts.value(0), parts.value(1), buffer.mid(headerEnd + 4, length)};
     m_buffers.remove(socket);
     requests.append(request);
+    if(m_sinceFinish.isValid() && m_sinceFinish.elapsed() < shutdownWindowMs){
+      (request.path == "/api/version" ? versionPolledDuringShutdown : requestedDuringShutdown) = true;
+    }
 
+    m_notFound = false;
     const auto body = route(request);
     const bool fail = failSaves && request.path == "/api/saveProfile";
-    socket->write(QByteArray(fail ? "HTTP/1.1 500 Internal Server Error" : "HTTP/1.1 200 OK") + "\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: "
+    const char* status = m_notFound ? "HTTP/1.1 404 Not Found" : (fail ? "HTTP/1.1 500 Internal Server Error" : "HTTP/1.1 200 OK");
+    socket->write(QByteArray(status) + "\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: "
       + QByteArray::number(body.size()) + "\r\n\r\n" + body);
     socket->disconnectFromHost();
   }
@@ -140,6 +161,15 @@ private:
   {
     const auto& p = r.path;
     const auto bodyDoc = QJsonDocument::fromJson("[" + r.body + "]").array().first();
+
+    if(setupMode){
+      return routeSetup(r, bodyDoc);
+    }
+    if(p == "/api/webUIStatus" && normalModeAfter > 0){
+      normalModeAfter--;
+      m_notFound = true;
+      return "{}";
+    }
 
     if(p == "/api/version"){
       return json(QJsonObject{{"version", "9.9.9"}});
@@ -222,8 +252,55 @@ private:
     return json(QJsonObject{{"succeeded", true}});
   }
 
+  QByteArray routeSetup(const Request& r, const QJsonValue& bodyDoc)
+  {
+    const auto& p = r.path;
+
+    if(p == "/api/version"){
+      return json(QJsonObject{{"version", "9.9.9"}});
+    }
+    if(p == "/api/configFilePath"){
+      return json(QJsonObject{{"configFilePath", "/tmp/huenicorn/config.json"}});
+    }
+    if(p == "/api/autodetectBridge"){
+      QJsonArray bridges;
+      for(const auto& address : detectedBridges){
+        bridges.append(QJsonObject{{"internalipaddress", address}});
+      }
+      return json(QJsonObject{{"succeeded", true}, {"bridges", bridges}});
+    }
+    if(p == "/api/validateBridgeAddress"){
+      m_bridge = bodyDoc.toObject().value("bridgeAddress").toString();
+      return json(QJsonObject{{"succeeded", m_bridge == knownBridge}});
+    }
+    if(p == "/api/registerNewUser"){
+      if(++registerAttempts <= linkButtonAfter){
+        return json(QJsonObject{{"succeeded", false}, {"error", pairError}});
+      }
+      return json(QJsonObject{{"succeeded", true}, {"username", "new-user"}, {"clientkey", "00112233445566778899AABBCCDDEEFF"}});
+    }
+    if(p == "/api/validateCredentials"){
+      return json(QJsonObject{{"succeeded", bodyDoc.toObject().value("username").toString() == knownUser}});
+    }
+    if(p == "/api/abort"){
+      return "{}";
+    }
+    if(p == "/api/finishSetup"){
+      setupFinished = true;
+      setupMode = false;
+      m_sinceFinish.start();
+      return json(QJsonObject{{"version", "9.9.9"}});
+    }
+
+    m_notFound = true;
+    return "{}";
+  }
+
   QTcpServer m_server;
   QHash<QTcpSocket*, QByteArray> m_buffers;
+  bool m_notFound{false};
+  QElapsedTimer m_sinceFinish;
+  QString m_bridge;
   QString m_area{"area-a"};
   QJsonObject m_scratch;
   int m_scratchIndex{0};

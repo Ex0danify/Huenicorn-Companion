@@ -23,7 +23,7 @@ public:
   QUrl baseUrl() const;
 
   void get(const QString& path, Callback callback, int timeoutMs = DefaultTimeoutMs);
-  void put(const QString& path, const QJsonValue& body, Callback callback);
+  void put(const QString& path, const QJsonValue& body, Callback callback, int timeoutMs = DefaultTimeoutMs);
   void post(const QString& path, const QJsonValue& body, Callback callback, int timeoutMs = DefaultTimeoutMs);
 
   // The daemon expects bare JSON scalars as bodies, which QJsonDocument cannot hold

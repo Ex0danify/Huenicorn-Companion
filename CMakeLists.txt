@@ -17,6 +17,7 @@ add_compile_options(-Wall -Wextra -pedantic)
 
 add_subdirectory(src/api)
 add_subdirectory(src/daemon)
+add_subdirectory(src/setup)
 add_subdirectory(src/settings)
 add_subdirectory(src/updater)
 add_subdirectory(src/tray)

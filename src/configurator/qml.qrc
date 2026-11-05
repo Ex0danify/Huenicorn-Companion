@@ -8,6 +8,7 @@
     <file>qml/components/Icon.qml</file>
     <file>qml/components/PillButton.qml</file>
     <file>qml/components/Segmented.qml</file>
+    <file>qml/components/TextBox.qml</file>
     <file>qml/components/TabButton.qml</file>
     <file>qml/components/Toggle.qml</file>
     <file>qml/pages/ChannelRect.qml</file>
@@ -15,6 +16,7 @@
     <file>qml/pages/LayoutPage.qml</file>
     <file>qml/pages/LightsPage.qml</file>
     <file>qml/pages/SettingsPage.qml</file>
+    <file>qml/pages/SetupPage.qml</file>
     <file>qml/pages/SyncPage.qml</file>
     <file>qml/pages/UpdateCard.qml</file>
   </qresource>

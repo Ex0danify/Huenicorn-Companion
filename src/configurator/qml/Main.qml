@@ -100,7 +100,7 @@ Window {
 
         Text {
             anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-            visible: backend.running
+            visible: backend.running && !backend.setup.active
             text: backend.saving ? qsTr("Saving…") : (backend.dirty ? qsTr("Not saved") : qsTr("Saved"))
             color: Theme.textDim
             font.pixelSize: Theme.fontBody
@@ -111,6 +111,7 @@ Window {
         id: content
         anchors { left: parent.left; right: parent.right; top: header.bottom; bottom: tabs.top }
         anchors.topMargin: 6
+        visible: !backend.setup.active
 
         SyncPage { anchors.fill: parent; visible: window.tab === 0 }
         LayoutPage { id: layoutPage; anchors.fill: parent; visible: window.tab === 1 }
@@ -118,10 +119,17 @@ Window {
         SettingsPage { anchors.fill: parent; visible: window.tab === 3 }
     }
 
+    SetupPage {
+        anchors { left: parent.left; right: parent.right; top: header.bottom; bottom: parent.bottom }
+        anchors.topMargin: 6
+        visible: backend.setup.active
+    }
+
     Rectangle {
         id: tabs
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
         height: 112
+        visible: !backend.setup.active
         color: Theme.background
 
         Rectangle { anchors { left: parent.left; right: parent.right; top: parent.top } height: 1; color: Theme.border }

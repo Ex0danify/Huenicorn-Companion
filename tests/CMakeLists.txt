@@ -1,6 +1,7 @@
 add_subdirectory(support)
 add_subdirectory(api)
 add_subdirectory(daemon)
+add_subdirectory(setup)
 add_subdirectory(updater)
 add_subdirectory(configurator)
 add_subdirectory(tray)
