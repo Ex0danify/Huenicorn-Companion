@@ -49,10 +49,10 @@ public:
   int normalModeAfter{0};         // webUIStatus requests answered with 404 once setup finished
   int registerAttempts{0};
   bool setupFinished{false};
-  // The real daemon crashes on a request that lands while its setup server stops.
-  // Version polls are ignored here, the tests run them far more often than the app.
+  // The real daemon crashes on a request that lands while its setup server stops
   int shutdownWindowMs{0};
   bool requestedDuringShutdown{false};
+  bool versionPolledDuringShutdown{false};
 
   int count(const QString& method, const QString& pathPrefix) const
   {
@@ -136,8 +136,8 @@ private:
     Request request{parts.value(0), parts.value(1), buffer.mid(headerEnd + 4, length)};
     m_buffers.remove(socket);
     requests.append(request);
-    if(m_sinceFinish.isValid() && m_sinceFinish.elapsed() < shutdownWindowMs && request.path != "/api/version"){
-      requestedDuringShutdown = true;
+    if(m_sinceFinish.isValid() && m_sinceFinish.elapsed() < shutdownWindowMs){
+      (request.path == "/api/version" ? versionPolledDuringShutdown : requestedDuringShutdown) = true;
     }
 
     m_notFound = false;

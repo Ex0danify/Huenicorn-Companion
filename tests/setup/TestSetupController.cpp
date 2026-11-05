@@ -128,6 +128,22 @@ private slots:
     QVERIFY(!f.api.requestedDuringShutdown);
   }
 
+  void pausesDaemonPollingWhileItsSetupServerStops()
+  {
+    Fixture f;
+    f.api.shutdownWindowMs = 250;
+    f.setup->setFinishDelayMs(400);
+    f.toPairStep();
+
+    f.setup->submitCredentials("known-user", "00112233445566778899AABBCCDDEEFF");
+    QTRY_VERIFY_WITH_TIMEOUT(f.setup->ready(), 5000);
+    QVERIFY(!f.api.versionPolledDuringShutdown);
+
+    // Monitoring picks up again afterwards
+    const int polls = f.api.count("GET", "/api/version");
+    QTRY_VERIFY(f.api.count("GET", "/api/version") > polls);
+  }
+
   void doesNotReportReadyBeforeTheDaemonSwitchedMode()
   {
     Fixture f;

@@ -43,6 +43,9 @@ public:
   void setPollIntervalMs(int ms);
   void setStopTimeoutMs(int ms);
 
+  // For phases where any request to the daemon is unsafe
+  void setPollingPaused(bool paused);
+
   void beginMonitoring();
 
 public slots:
@@ -74,6 +77,7 @@ private:
   int m_startTimeoutMs{60000};
   bool m_restartPending{false};
   int m_missedPolls{0};
+  bool m_pollPaused{false};
 
   QProcess m_process;
   ApiClient m_api;

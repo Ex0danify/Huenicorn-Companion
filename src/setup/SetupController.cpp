@@ -90,6 +90,7 @@ void SetupController::probe()
 void SetupController::reset()
 {
   m_epoch++;
+  m_controller.setPollingPaused(false);
   m_bridges.clear();
   m_bridgeAddress.clear();
   m_error.clear();
@@ -326,6 +327,7 @@ void SetupController::finish()
   const int epoch = m_epoch;
   setError({});
   setStep("finishing");
+  m_controller.setPollingPaused(true);
 
   // The setup server stops right after answering, so the reply itself carries no information.
   // A request that reaches it while it shuts down crashes the daemon, hence the grace period.
@@ -355,12 +357,14 @@ void SetupController::waitForNormalMode()
     }
 
     if(ok){
+      m_controller.setPollingPaused(false);
       setStep("bridge");
       setMode(Mode::Ready);
       return;
     }
 
     if(m_finishAttempts >= MaxFinishAttempts){
+      m_controller.setPollingPaused(false);
       setError(tr("The daemon did not come up after setup. Check the log from the tray menu."));
       return;
     }
@@ -387,6 +391,7 @@ void SetupController::back()
 void SetupController::retry()
 {
   m_epoch++;
+  m_controller.setPollingPaused(false);
   m_discovering = m_pairing = m_validating = false;
   emit busyChanged();
   setError({});
