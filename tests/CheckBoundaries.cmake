@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+
 # Allowed #include directions between modules under src/.
 # A module may include itself and the modules listed after its name.
 set(ALLOWED_api "")
