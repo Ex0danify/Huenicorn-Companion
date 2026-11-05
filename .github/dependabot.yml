@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Keep the SHA-pinned actions current; grouped so a week's bumps arrive as one reviewable PR.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # Conventional Commit titles, so the PR title check and release-please accept them.
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]

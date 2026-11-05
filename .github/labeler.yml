@@ -1,0 +1,46 @@
+# Area labels applied to a pull request from the files it changes.
+
+"area: api":
+  - changed-files:
+      - any-glob-to-any-file: ["src/api/**"]
+
+"area: daemon":
+  - changed-files:
+      - any-glob-to-any-file: ["src/daemon/**"]
+
+"area: settings":
+  - changed-files:
+      - any-glob-to-any-file: ["src/settings/**"]
+
+"area: tray":
+  - changed-files:
+      - any-glob-to-any-file: ["src/tray/**", "resources/**"]
+
+"area: configurator":
+  - changed-files:
+      - any-glob-to-any-file: ["src/configurator/**"]
+
+"area: app":
+  - changed-files:
+      - any-glob-to-any-file: ["src/app/**"]
+
+"area: packaging":
+  - changed-files:
+      - any-glob-to-any-file: ["packaging/**", "cmake/Packaging.cmake"]
+
+"area: build":
+  - changed-files:
+      - any-glob-to-any-file: ["CMakeLists.txt", "**/CMakeLists.txt", "cmake/**"]
+
+"area: ci":
+  - changed-files:
+      - any-glob-to-any-file: [".github/**", "release-please-config.json", ".release-please-manifest.json"]
+
+"type: documentation":
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.md", "docs/**"]
+
+# The dedicated test tree. Tests colocated with a module do not exist here, so this marks a pull request that is about tests.
+"type: test":
+  - changed-files:
+      - any-glob-to-any-file: ["tests/**"]
