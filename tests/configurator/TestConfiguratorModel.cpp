@@ -14,8 +14,9 @@ private:
     DaemonController controller;
     std::unique_ptr<ConfiguratorModel> model;
 
-    Fixture()
+    explicit Fixture(bool setupMode = false)
     {
+      api.setupMode = setupMode;
       controller.setPort(api.port());
       controller.setPollIntervalMs(100);
       model = std::make_unique<ConfiguratorModel>(controller);
@@ -52,6 +53,34 @@ private slots:
     QCOMPARE(f.model->interpolation(), 2);
     QVERIFY(!f.model->dirty());
     QCOMPARE(f.channel(0).value("name").toString(), QString("Ceiling Spot 1"));
+  }
+
+  void doesNotLoadWhileTheDaemonIsInSetup()
+  {
+    Fixture f(true);
+    QSignalSpy failures(f.model.get(), &ConfiguratorModel::requestFailed);
+
+    QTRY_VERIFY_WITH_TIMEOUT(f.model->setup()->active(), 5000);
+    QTest::qWait(300);
+
+    QVERIFY(!f.model->loaded());
+    QCOMPARE(f.api.count("GET", "/api/channels"), 0);
+    QVERIFY(failures.isEmpty());
+  }
+
+  void loadsAfterSetupFinished()
+  {
+    Fixture f(true);
+    QTRY_VERIFY_WITH_TIMEOUT(f.model->setup()->active(), 5000);
+    f.model->setup()->setRetryIntervalMs(10);
+
+    f.model->setup()->submitBridge("192.168.1.20");
+    QTRY_COMPARE(f.model->setup()->step(), QString("pair"));
+    f.model->setup()->pair();
+
+    QTRY_VERIFY_WITH_TIMEOUT(f.model->loaded(), 5000);
+    QVERIFY(!f.model->setup()->active());
+    QCOMPARE(f.model->channels().size(), 2);
   }
 
   void clearsWhenDaemonDisappears()

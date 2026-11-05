@@ -27,12 +27,19 @@ namespace
 ConfiguratorModel::ConfiguratorModel(DaemonController& controller, QObject* parent)
   : QObject(parent)
   , m_controller(controller)
+  , m_setup(controller)
 {
   m_saveTimer.setSingleShot(true);
   m_saveTimer.setInterval(SaveDelayMs);
   connect(&m_saveTimer, &QTimer::timeout, this, &ConfiguratorModel::save);
 
   connect(&m_controller, &DaemonController::stateChanged, this, &ConfiguratorModel::onDaemonState);
+  connect(&m_setup, &SetupController::modeChanged, this, [this](){
+    if(m_setup.ready() && running()){
+      m_api.setBaseUrl(m_controller.baseUrl());
+      refresh();
+    }
+  });
   onDaemonState();
 }
 
@@ -96,6 +103,7 @@ QVariantList ConfiguratorModel::interpolations() const { return m_interpolations
 int ConfiguratorModel::interpolation() const { return m_interpolation; }
 QString ConfiguratorModel::daemonPath() const { return m_controller.daemonPath(); }
 int ConfiguratorModel::port() const { return m_controller.port(); }
+SetupController* ConfiguratorModel::setup() { return &m_setup; }
 
 
 QString ConfiguratorModel::currentAreaName() const
@@ -124,9 +132,12 @@ void ConfiguratorModel::onDaemonState()
 {
   emit daemonStateChanged();
 
+  // Loading waits for the setup probe, a daemon in setup mode lacks the normal API
   if(running()){
     m_api.setBaseUrl(m_controller.baseUrl());
-    refresh();
+    if(m_setup.ready()){
+      refresh();
+    }
   }
   else{
     clear();

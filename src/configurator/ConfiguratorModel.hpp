@@ -9,6 +9,7 @@
 
 #include "api/ApiClient.hpp"
 #include "daemon/DaemonController.hpp"
+#include "setup/SetupController.hpp"
 
 // State and actions behind the QML configurator. Mirrors the daemon's settings
 // and keeps them in sync through the REST API. Changes are persisted
@@ -46,6 +47,8 @@ class ConfiguratorModel : public QObject
   Q_PROPERTY(QString daemonPath READ daemonPath NOTIFY daemonStateChanged)
   Q_PROPERTY(int port READ port NOTIFY daemonStateChanged)
 
+  Q_PROPERTY(SetupController* setup READ setup CONSTANT)
+
 public:
   explicit ConfiguratorModel(DaemonController& controller, QObject* parent = nullptr);
 
@@ -77,6 +80,7 @@ public:
 
   QString daemonPath() const;
   int port() const;
+  SetupController* setup();
 
   Q_INVOKABLE void refresh();
   Q_INVOKABLE void toggleDaemon();
@@ -121,6 +125,7 @@ private:
 
   DaemonController& m_controller;
   ApiClient m_api;
+  SetupController m_setup;
 
   bool m_loaded{false};
   bool m_dirty{false};
