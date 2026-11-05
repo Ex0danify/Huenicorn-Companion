@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Huenicorn Tray
+Comment=Control the Huenicorn Hue sync daemon from the system tray
+Exec=huenicorn-qt
+Icon=huenicorn-qt
+Categories=Utility;
+StartupNotify=false

@@ -1,0 +1,3 @@
+add_executable(TestDaemonController TestDaemonController.cpp)
+target_link_libraries(TestDaemonController PRIVATE huenicorn_daemon test_support)
+add_test(NAME DaemonController COMMAND TestDaemonController)

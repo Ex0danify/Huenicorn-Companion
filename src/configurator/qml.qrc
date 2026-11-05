@@ -1,0 +1,20 @@
+<RCC>
+  <qresource prefix="/configurator">
+    <file>qml/Main.qml</file>
+    <file>qml/theme/qmldir</file>
+    <file>qml/theme/Theme.qml</file>
+    <file>qml/components/Card.qml</file>
+    <file>qml/components/HueSlider.qml</file>
+    <file>qml/components/Icon.qml</file>
+    <file>qml/components/PillButton.qml</file>
+    <file>qml/components/Segmented.qml</file>
+    <file>qml/components/TabButton.qml</file>
+    <file>qml/components/Toggle.qml</file>
+    <file>qml/pages/ChannelRect.qml</file>
+    <file>qml/pages/EmptyState.qml</file>
+    <file>qml/pages/LayoutPage.qml</file>
+    <file>qml/pages/LightsPage.qml</file>
+    <file>qml/pages/SettingsPage.qml</file>
+    <file>qml/pages/SyncPage.qml</file>
+  </qresource>
+</RCC>
