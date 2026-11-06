@@ -265,6 +265,8 @@ private slots:
       QTRY_VERIFY(chooser->isVisible() && chooser->width() > 0 && chooser->height() > 0);
       QSignalSpy spy(&configurator.model(), &ConfiguratorModel::chooseDaemonRequested);
       const QPointF p = chooser->mapToScene(QPointF(chooser->width() / 2, chooser->height() / 2));
+      QVERIFY2(QRectF(0, 0, window->width(), window->height()).contains(p),
+               qPrintable(QString("button at %1,%2 is outside the %3x%4 window").arg(p.x()).arg(p.y()).arg(window->width()).arg(window->height())));
       QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, p.toPoint());
       QCOMPARE(spy.count(), 1);
 
