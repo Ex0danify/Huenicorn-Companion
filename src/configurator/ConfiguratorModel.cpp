@@ -200,9 +200,12 @@ void ConfiguratorModel::refresh()
   m_pending = 4;
   auto done = [this](){
     if(--m_pending == 0){
-      m_dirty = false;
-      m_saveTimer.stop();
-      emit dirtyChanged();
+      // A reload after a failed request must not drop a save that is still owed
+      if(!m_loaded){
+        m_dirty = false;
+        m_saveTimer.stop();
+        emit dirtyChanged();
+      }
       setLoaded(true);
     }
   };

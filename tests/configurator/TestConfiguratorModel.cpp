@@ -195,6 +195,20 @@ private slots:
     QVERIFY(!f.model->dirty());
   }
 
+  void failedRequestDoesNotCancelAPendingSave()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+
+    f.model->setInterpolation(1);
+    QTRY_VERIFY(f.model->dirty());
+    f.api.failPaths = {"/api/setChannelActivity/1"};
+    f.model->setChannelActive(1, true);
+
+    QTRY_COMPARE(f.api.count("GET", "/api/channels"), 2);
+    QTRY_COMPARE(f.api.count("POST", "/api/saveProfile"), 1);
+  }
+
   void selectingAreaSendsIdAsJsonString()
   {
     Fixture f;
