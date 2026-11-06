@@ -47,15 +47,15 @@ private slots:
   void findsChecksumByExactName()
   {
     const QByteArray sums =
-      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  huenicorn-qt-0.3.0-fedora.rpm\n"
-      "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB *huenicorn-qt-0.3.0-arch.pkg.tar.zst\n"
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  huenicorn-companion-0.3.0-fedora.rpm\n"
+      "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB *huenicorn-companion-0.3.0-arch.pkg.tar.zst\n"
       "cccc  too-short-hash.deb\n";
 
-    QCOMPARE(Release::checksumFor(sums, "huenicorn-qt-0.3.0-fedora.rpm").value(), QString(64, 'a'));
-    QCOMPARE(Release::checksumFor(sums, "huenicorn-qt-0.3.0-arch.pkg.tar.zst").value(), QString(64, 'b'));
+    QCOMPARE(Release::checksumFor(sums, "huenicorn-companion-0.3.0-fedora.rpm").value(), QString(64, 'a'));
+    QCOMPARE(Release::checksumFor(sums, "huenicorn-companion-0.3.0-arch.pkg.tar.zst").value(), QString(64, 'b'));
     QVERIFY(!Release::checksumFor(sums, "fedora.rpm").has_value());
     QVERIFY(!Release::checksumFor(sums, "too-short-hash.deb").has_value());
-    QVERIFY(!Release::checksumFor({}, "huenicorn-qt-0.3.0-fedora.rpm").has_value());
+    QVERIFY(!Release::checksumFor({}, "huenicorn-companion-0.3.0-fedora.rpm").has_value());
   }
 
   void parsesReleaseJson()
@@ -63,7 +63,7 @@ private slots:
     const auto json = QJsonObject{
       {"tag_name", "v0.3.0"},
       {"body", "notes"},
-      {"html_url", "https://github.com/Ex0danify/Huenicorn-GUI/releases/tag/v0.3.0"},
+      {"html_url", "https://github.com/Ex0danify/Huenicorn-Companion/releases/tag/v0.3.0"},
       {"assets", QJsonArray{
         QJsonObject{{"name", "good.rpm"}, {"browser_download_url", "https://github.com/good.rpm"}},
         QJsonObject{{"name", "insecure.rpm"}, {"browser_download_url", "http://example.com/insecure.rpm"}},
@@ -112,11 +112,11 @@ private slots:
   void picksTheAssetForTheSystem()
   {
     const QList<ReleaseAsset> assets = {
-      {"huenicorn-qt-0.3.0-fedora.rpm", QUrl("https://x/fedora.rpm")},
-      {"huenicorn-qt-0.3.0-ubuntu-24.04.deb", QUrl("https://x/ubuntu.deb")},
-      {"huenicorn-qt-0.3.0-debian-13.deb", QUrl("https://x/debian.deb")},
-      {"huenicorn-qt-0.3.0-arch.pkg.tar.zst", QUrl("https://x/arch.zst")},
-      {"huenicorn-qt-0.3.0-linux-x86_64.tar.gz", QUrl("https://x/tarball")},
+      {"huenicorn-companion-0.3.0-fedora.rpm", QUrl("https://x/fedora.rpm")},
+      {"huenicorn-companion-0.3.0-ubuntu-24.04.deb", QUrl("https://x/ubuntu.deb")},
+      {"huenicorn-companion-0.3.0-debian-13.deb", QUrl("https://x/debian.deb")},
+      {"huenicorn-companion-0.3.0-arch.pkg.tar.zst", QUrl("https://x/arch.zst")},
+      {"huenicorn-companion-0.3.0-linux-x86_64.tar.gz", QUrl("https://x/tarball")},
       {"SHA256SUMS", QUrl("https://x/sums")}
     };
 
@@ -125,11 +125,11 @@ private slots:
       return asset ? asset->name : QString();
     };
 
-    QCOMPARE(pick("ID=nobara\nID_LIKE=\"rhel centos fedora\""), QString("huenicorn-qt-0.3.0-fedora.rpm"));
-    QCOMPARE(pick("ID=debian"), QString("huenicorn-qt-0.3.0-debian-13.deb"));
-    QCOMPARE(pick("ID=ubuntu\nID_LIKE=debian"), QString("huenicorn-qt-0.3.0-ubuntu-24.04.deb"));
-    QCOMPARE(pick("ID=linuxmint\nID_LIKE=\"ubuntu debian\""), QString("huenicorn-qt-0.3.0-ubuntu-24.04.deb"));
-    QCOMPARE(pick("ID=manjaro\nID_LIKE=arch"), QString("huenicorn-qt-0.3.0-arch.pkg.tar.zst"));
+    QCOMPARE(pick("ID=nobara\nID_LIKE=\"rhel centos fedora\""), QString("huenicorn-companion-0.3.0-fedora.rpm"));
+    QCOMPARE(pick("ID=debian"), QString("huenicorn-companion-0.3.0-debian-13.deb"));
+    QCOMPARE(pick("ID=ubuntu\nID_LIKE=debian"), QString("huenicorn-companion-0.3.0-ubuntu-24.04.deb"));
+    QCOMPARE(pick("ID=linuxmint\nID_LIKE=\"ubuntu debian\""), QString("huenicorn-companion-0.3.0-ubuntu-24.04.deb"));
+    QCOMPARE(pick("ID=manjaro\nID_LIKE=arch"), QString("huenicorn-companion-0.3.0-arch.pkg.tar.zst"));
     QCOMPARE(pick("ID=gentoo"), QString());
 
     // A package kind with no matching asset must not fall back to another kind

@@ -48,15 +48,15 @@ jobs:
           QT_QPA_PLATFORM: offscreen
       - name: Package
         run: |
-          version=$(sed -n 's/^project(HuenicornQt VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          version=$(sed -n 's/^project(HuenicornCompanion VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
           cd build
           cpack -G "${{ matrix.generators }}"
           mkdir ../dist
           for f in *.rpm *.deb *.tar.gz; do
             [ -e "$f" ] || continue
             case "$f" in
-              *.deb) cp "$f" "../dist/huenicorn-qt-$version-${{ matrix.name }}.deb" ;;
-              *.rpm) cp "$f" "../dist/huenicorn-qt-$version-${{ matrix.name }}.rpm" ;;
+              *.deb) cp "$f" "../dist/huenicorn-companion-$version-${{ matrix.name }}.deb" ;;
+              *.rpm) cp "$f" "../dist/huenicorn-companion-$version-${{ matrix.name }}.rpm" ;;
               *) cp "$f" ../dist/ ;;
             esac
           done
@@ -76,16 +76,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build package
         run: |
-          version=$(sed -n 's/^project(HuenicornQt VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          version=$(sed -n 's/^project(HuenicornCompanion VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
           useradd -m builder
           mkdir /home/builder/pkg
           cp packaging/arch/PKGBUILD /home/builder/pkg/
-          tar czf "/home/builder/pkg/huenicorn-qt-$version.tar.gz" \
-            --exclude=.git --exclude=build --transform "s,^\./,huenicorn-qt-$version/," .
+          tar czf "/home/builder/pkg/huenicorn-companion-$version.tar.gz" \
+            --exclude=.git --exclude=build --transform "s,^\./,huenicorn-companion-$version/," .
           chown -R builder /home/builder/pkg
           su builder -c "cd ~/pkg && HUENICORN_VERSION=$version makepkg -f --noconfirm"
           mkdir dist
-          cp /home/builder/pkg/*.pkg.tar.zst "dist/huenicorn-qt-$version-arch.pkg.tar.zst"
+          cp /home/builder/pkg/*.pkg.tar.zst "dist/huenicorn-companion-$version-arch.pkg.tar.zst"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist-arch
@@ -110,7 +110,7 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          version=$(sed -n 's/^project(HuenicornQt VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          version=$(sed -n 's/^project(HuenicornCompanion VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
           if [ "v$version" != "$TAG" ]; then echo "::error::Tag $TAG does not match the CMake version $version"; exit 1; fi
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -122,10 +122,10 @@ jobs:
           set -euo pipefail
           cd release-assets
           ls -l
-          sha256sum huenicorn-qt-* > SHA256SUMS
+          sha256sum huenicorn-companion-* > SHA256SUMS
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
-          subject-path: release-assets/huenicorn-qt-*
+          subject-path: release-assets/huenicorn-companion-*
       - name: Attach to the release
         env:
           GH_TOKEN: ${{ github.token }}

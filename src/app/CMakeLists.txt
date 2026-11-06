@@ -1,6 +1,6 @@
 # Composition root: the only place that knows every module
-add_executable(huenicorn-qt main.cpp)
-target_link_libraries(huenicorn-qt PRIVATE
+add_executable(huenicorn-companion main.cpp)
+target_link_libraries(huenicorn-companion PRIVATE
   huenicorn_tray
   huenicorn_configurator
   huenicorn_settings
@@ -10,9 +10,9 @@ target_link_libraries(huenicorn-qt PRIVATE
   huenicorn_i18n
   huenicorn_preferences
 )
-target_compile_definitions(huenicorn-qt PRIVATE HUENICORN_QT_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(huenicorn-companion PRIVATE HUENICORN_COMPANION_VERSION="${PROJECT_VERSION}")
 
 # Keep the binary at the build root, where it has always been
-set_target_properties(huenicorn-qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set_target_properties(huenicorn-companion PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-install(TARGETS huenicorn-qt RUNTIME DESTINATION bin)
+install(TARGETS huenicorn-companion RUNTIME DESTINATION bin)

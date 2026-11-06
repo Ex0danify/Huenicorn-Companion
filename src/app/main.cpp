@@ -18,17 +18,17 @@
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
-  app.setApplicationName("huenicorn-qt");
-  app.setApplicationVersion(HUENICORN_QT_VERSION);
+  app.setApplicationName("huenicorn-companion");
+  app.setApplicationVersion(HUENICORN_COMPANION_VERSION);
   app.setOrganizationName("huenicorn");
-  app.setDesktopFileName("huenicorn-qt");
+  app.setDesktopFileName("huenicorn-companion");
   app.setQuitOnLastWindowClosed(false);
 
   Settings settings;
   Localization localization(settings);
 
   if(!QSystemTrayIcon::isSystemTrayAvailable()){
-    QMessageBox::critical(nullptr, QCoreApplication::translate("App", "Huenicorn"), QCoreApplication::translate("App", "No system tray available on this desktop."));
+    QMessageBox::critical(nullptr, QCoreApplication::translate("App", "Huenicorn Companion"), QCoreApplication::translate("App", "No system tray available on this desktop."));
     return 1;
   }
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   controller.setDaemonPath(settings.resolvedDaemonPath());
   controller.setPort(settings.port());
 
-  UpdateController updater(HUENICORN_QT_VERSION);
+  UpdateController updater(HUENICORN_COMPANION_VERSION);
   updater.setAutoCheck(settings.checkUpdatesOnStart());
   updater.setSkippedVersion(settings.skippedUpdateVersion());
   QObject::connect(&updater, &UpdateController::autoCheckChanged, [&](){
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 
   // The installed binary is replaced on disk, so ask the new one to start once this instance is gone
   QObject::connect(&updater, &UpdateController::restartRequested, [&tray](){
-    auto executable = QStandardPaths::findExecutable("huenicorn-qt");
+    auto executable = QStandardPaths::findExecutable("huenicorn-companion");
     if(executable.isEmpty()){
       executable = QCoreApplication::applicationFilePath().remove(" (deleted)");
     }

@@ -214,7 +214,7 @@ QNetworkRequest UpdateController::makeRequest(const QUrl& url) const
   QNetworkRequest request(url);
   request.setTransferTimeout(TransferTimeoutMs);
   request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-  request.setHeader(QNetworkRequest::UserAgentHeader, "huenicorn-qt/" + m_currentVersion);
+  request.setHeader(QNetworkRequest::UserAgentHeader, "huenicorn-companion/" + m_currentVersion);
   request.setRawHeader("Accept", "application/vnd.github+json");
   return request;
 }

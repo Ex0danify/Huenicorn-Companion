@@ -4,7 +4,7 @@
 <context>
     <name>App</name>
     <message>
-        <source>Huenicorn</source>
+        <source>Huenicorn Companion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -319,7 +319,7 @@
 <context>
     <name>Main</name>
     <message>
-        <source>Huenicorn</source>
+        <source>Huenicorn Companion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -684,7 +684,7 @@
 <context>
     <name>TrayApp</name>
     <message>
-        <source>Huenicorn</source>
+        <source>Huenicorn Companion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -736,7 +736,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Huenicorn: %1</source>
+        <source>Huenicorn Companion: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

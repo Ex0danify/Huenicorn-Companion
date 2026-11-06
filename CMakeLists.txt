@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(HuenicornQt VERSION 0.3.0 LANGUAGES CXX) # x-release-please-version
+project(HuenicornCompanion VERSION 0.3.0 LANGUAGES CXX) # x-release-please-version
 
 option(BUILD_TESTS "Build tests" ON)
 
@@ -27,8 +27,8 @@ add_subdirectory(src/tray)
 add_subdirectory(src/configurator)
 add_subdirectory(src/app)
 
-install(FILES resources/huenicorn-qt.desktop DESTINATION share/applications)
-install(FILES resources/logo.svg DESTINATION share/icons/hicolor/scalable/apps RENAME huenicorn-qt.svg)
+install(FILES resources/huenicorn-companion.desktop DESTINATION share/applications)
+install(FILES resources/logo.svg DESTINATION share/icons/hicolor/scalable/apps RENAME huenicorn-companion.svg)
 
 include(cmake/Packaging.cmake)
 

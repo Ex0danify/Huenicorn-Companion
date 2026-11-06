@@ -93,7 +93,7 @@ std::optional<ReleaseAsset> Platform::pickAsset(const QList<ReleaseAsset>& asset
 
   QList<ReleaseAsset> candidates;
   for(const auto& asset : assets){
-    if(asset.name.startsWith("huenicorn-qt-") && asset.name.endsWith(suffix)){
+    if(asset.name.startsWith("huenicorn-companion-") && asset.name.endsWith(suffix)){
       candidates.append(asset);
     }
   }

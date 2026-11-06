@@ -4,7 +4,7 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "huenicorn-qt",
+      "package-name": "huenicorn-companion",
       "include-component-in-tag": false,
       "skip-changelog": true,
       "extra-files": [

@@ -25,7 +25,7 @@ TrayApp::TrayApp(DaemonController& controller, Settings& settings, QObject* pare
   connect(&m_controller, &DaemonController::stateChanged, this, [this](DaemonController::State state){
     refresh();
     if(state == DaemonController::State::Error){
-      m_tray.showMessage(tr("Huenicorn"), m_controller.lastError(), QSystemTrayIcon::Warning, 8000);
+      m_tray.showMessage(tr("Huenicorn Companion"), m_controller.lastError(), QSystemTrayIcon::Warning, 8000);
     }
   });
   connect(&m_controller, &DaemonController::logLine, &m_log, &LogWindow::append);
@@ -110,7 +110,7 @@ void TrayApp::refresh()
   }
 
   m_tray.setIcon(IconFactory::forState(state));
-  m_tray.setToolTip(tr("Huenicorn: %1").arg(text));
+  m_tray.setToolTip(tr("Huenicorn Companion: %1").arg(text));
 
   const bool idle = (state == Stopped || state == Error);
   m_startAction->setEnabled(idle);
