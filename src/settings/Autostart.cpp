@@ -11,7 +11,7 @@ namespace
   QString entryPath()
   {
     const auto dir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/autostart";
-    return dir + "/huenicorn-qt.desktop";
+    return dir + "/huenicorn-companion.desktop";
   }
 }
 
@@ -39,9 +39,9 @@ bool Autostart::setEnabled(bool enabled)
   QTextStream out(&file);
   out << "[Desktop Entry]\n"
       << "Type=Application\n"
-      << "Name=Huenicorn Tray\n"
+      << "Name=Huenicorn Companion\n"
       << "Exec=\"" << QCoreApplication::applicationFilePath() << "\"\n"
-      << "Icon=huenicorn-qt\n"
+      << "Icon=huenicorn-companion\n"
       << "X-GNOME-Autostart-enabled=true\n";
   return true;
 }

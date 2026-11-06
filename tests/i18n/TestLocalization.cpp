@@ -129,7 +129,7 @@ private slots:
 
   void germanIsComplete()
   {
-    const auto entries = readCatalog(QDir(TRANSLATIONS_DIR).filePath("huenicorn-qt_de.ts"));
+    const auto entries = readCatalog(QDir(TRANSLATIONS_DIR).filePath("huenicorn-companion_de.ts"));
     QVERIFY(!entries.isEmpty());
 
     for(const auto& entry : entries){

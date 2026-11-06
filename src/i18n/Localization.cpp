@@ -7,7 +7,7 @@
 namespace
 {
   const QString Prefix = ":/i18n/";
-  const QString Basename = "huenicorn-qt_";
+  const QString Basename = "huenicorn-companion_";
 
   QString normalized(const QString& code)
   {

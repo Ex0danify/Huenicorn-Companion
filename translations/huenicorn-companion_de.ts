@@ -4,8 +4,8 @@
 <context>
     <name>App</name>
     <message>
-        <source>Huenicorn</source>
-        <translation>Huenicorn</translation>
+        <source>Huenicorn Companion</source>
+        <translation>Huenicorn Companion</translation>
     </message>
     <message>
         <source>No system tray available on this desktop.</source>
@@ -319,8 +319,8 @@
 <context>
     <name>Main</name>
     <message>
-        <source>Huenicorn</source>
-        <translation>Huenicorn</translation>
+        <source>Huenicorn Companion</source>
+        <translation>Huenicorn Companion</translation>
     </message>
     <message>
         <source>Could not update the autostart entry</source>
@@ -684,8 +684,8 @@
 <context>
     <name>TrayApp</name>
     <message>
-        <source>Huenicorn</source>
-        <translation>Huenicorn</translation>
+        <source>Huenicorn Companion</source>
+        <translation>Huenicorn Companion</translation>
     </message>
     <message>
         <source>Start</source>
@@ -736,8 +736,8 @@
         <translation>Fehler: %1</translation>
     </message>
     <message>
-        <source>Huenicorn: %1</source>
-        <translation>Huenicorn: %1</translation>
+        <source>Huenicorn Companion: %1</source>
+        <translation>Huenicorn Companion: %1</translation>
     </message>
 </context>
 <context>

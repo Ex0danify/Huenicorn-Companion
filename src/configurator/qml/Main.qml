@@ -11,7 +11,7 @@ Window {
     height: 840
     minimumWidth: 420
     minimumHeight: 660
-    title: qsTr("Huenicorn")
+    title: qsTr("Huenicorn Companion")
     color: Theme.background
     visible: false
     onVisibleChanged: if(!visible) backend.flush()
@@ -105,7 +105,7 @@ Window {
                     }
                 }
                 Text {
-                    text: qsTr("Huenicorn")
+                    text: qsTr("Huenicorn Companion")
                     color: Theme.text
                     font.pixelSize: 21
                     font.bold: true

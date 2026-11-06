@@ -47,7 +47,7 @@ public:
   };
 
   static constexpr int CheckIntervalHours = 24;
-  static inline const QUrl DefaultApiUrl{"https://api.github.com/repos/Ex0danify/Huenicorn-GUI/releases/latest"};
+  static inline const QUrl DefaultApiUrl{"https://api.github.com/repos/Ex0danify/Huenicorn-Companion/releases/latest"};
 
   explicit UpdateController(const QString& currentVersion, QObject* parent = nullptr);
 

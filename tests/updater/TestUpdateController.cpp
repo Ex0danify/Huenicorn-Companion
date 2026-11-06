@@ -62,7 +62,7 @@ class TestUpdateController : public QObject
   Q_OBJECT
 
 private:
-  static constexpr const char* AssetName = "huenicorn-qt-0.3.0-fedora.rpm";
+  static constexpr const char* AssetName = "huenicorn-companion-0.3.0-fedora.rpm";
   const QByteArray m_package{"pretend this is an rpm"};
 
   void serveRelease(FakeGitHub& github, const QString& tag, const QByteArray& sums = {})
@@ -70,7 +70,7 @@ private:
     const QJsonObject release{
       {"tag_name", tag},
       {"body", "## Features\n* something"},
-      {"html_url", "https://github.com/Ex0danify/Huenicorn-GUI/releases/tag/" + tag},
+      {"html_url", "https://github.com/Ex0danify/Huenicorn-Companion/releases/tag/" + tag},
       {"assets", QJsonArray{
         QJsonObject{{"name", AssetName}, {"browser_download_url", github.url("/download/package")}},
         QJsonObject{{"name", "SHA256SUMS"}, {"browser_download_url", github.url("/download/sums")}}

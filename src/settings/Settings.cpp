@@ -13,7 +13,7 @@ namespace
 {
   QSettings store()
   {
-    return QSettings(QSettings::IniFormat, QSettings::UserScope, "huenicorn", "huenicorn-qt");
+    return QSettings(QSettings::IniFormat, QSettings::UserScope, "huenicorn", "huenicorn-companion");
   }
 }
 
