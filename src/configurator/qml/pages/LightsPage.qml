@@ -35,12 +35,16 @@ Flickable {
             visible: !backend.loaded
         }
 
+        // Sized by count so a value update keeps the cards, and with them hover and drag state
         Repeater {
-            model: backend.channels
+            model: backend.channels.length
 
             delegate: Card {
                 id: card
-                required property var modelData
+                required property int index
+                readonly property var modelData: backend.channels[index] || ({
+                    channelId: -1, name: "", active: false, color: "#000000", gamma: 0
+                })
                 width: column.width
                 height: 76 + 28 + 1
 

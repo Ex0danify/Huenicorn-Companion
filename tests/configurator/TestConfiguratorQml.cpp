@@ -181,7 +181,6 @@ private slots:
       QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
       window->setProperty("tab", 2);
 
-      // Channel updates rebuild the delegates, so items are looked up again each time
       auto slider = [window](){ return itemByName(window->contentItem(), "gammaSlider"); };
       auto bubbleOpacity = [&slider](){
         auto* bubble = slider() ? itemByName(slider(), "valueBubble") : nullptr;
@@ -250,7 +249,19 @@ private slots:
       QTest::qWait(300);
       QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor/0"), 1);
 
+      // Resting on the knob shows the value, resetting must not make the bubble blink
+      QTest::mouseMove(window, onKnob);
+      auto* bubble = itemByName(slider(), "valueBubble");
+      QVERIFY(bubble != nullptr);
+      QTRY_COMPARE_WITH_TIMEOUT(bubble->property("opacity").toDouble(), 1.0, 2000);
+
       QTest::mouseDClick(window, Qt::LeftButton, Qt::NoModifier, onKnob);
+      double lowest = 1.0;
+      for(int i = 0; i < 35; i++){
+        QTest::qWait(20);
+        lowest = std::min(lowest, bubble->property("opacity").toDouble());
+      }
+      QCOMPARE(lowest, 1.0);
 
       QTRY_COMPARE_WITH_TIMEOUT(api.channels.at(0).toObject().value("gammaFactor").toDouble(), 0.0, 3000);
       window->hide();
