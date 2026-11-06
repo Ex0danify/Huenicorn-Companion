@@ -8,6 +8,7 @@ Item {
     property var model: []
     property var current: null
     property int spacing: 8
+    property color tileColor: Theme.surface
 
     signal picked(var value)
 
@@ -28,7 +29,7 @@ Item {
                 width: (root.width - (root.model.length - 1) * root.spacing) / Math.max(1, root.model.length)
                 height: root.height
                 radius: Theme.radiusTile
-                color: selected ? Theme.surfaceHover : (area.containsMouse ? Theme.surfaceRaised : Theme.surface)
+                color: selected ? Theme.surfaceHover : (area.containsMouse && root.enabled ? Theme.surfaceHover : root.tileColor)
                 Behavior on color { ColorAnimation { duration: 120 } }
 
                 Column {
@@ -56,7 +57,7 @@ Item {
                     id: area
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                    cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: root.picked(tile.modelData.value)
                 }
             }

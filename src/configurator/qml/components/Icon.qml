@@ -55,11 +55,53 @@ Canvas {
                 c.arc(w * xs[i], h * ys[i], w * 0.09, 0, Math.PI * 2)
                 c.fill()
             }
+        } else if (kind === "cog") {
+            var cx = w * 0.5, cy = h * 0.5
+            var ro = w * 0.42, rr = w * 0.31
+            var rad = Math.PI / 180
+            c.beginPath()
+            for (var k = 0; k < 8; k++) {
+                var base = k * 45
+                var steps = [[base - 16, rr], [base - 10, ro], [base + 10, ro], [base + 16, rr]]
+                for (var j = 0; j < 4; j++) {
+                    var px = cx + Math.cos(steps[j][0] * rad) * steps[j][1]
+                    var py = cy + Math.sin(steps[j][0] * rad) * steps[j][1]
+                    if (k === 0 && j === 0) c.moveTo(px, py); else c.lineTo(px, py)
+                }
+            }
+            c.closePath()
+            c.stroke()
+            c.beginPath()
+            c.arc(cx, cy, w * 0.13, 0, Math.PI * 2)
+            c.stroke()
         } else if (kind === "play") {
             c.beginPath()
             c.moveTo(w * 0.3, h * 0.2); c.lineTo(w * 0.8, h * 0.5); c.lineTo(w * 0.3, h * 0.8)
             c.closePath()
             c.fill()
+        } else if (kind === "stop") {
+            c.beginPath()
+            c.roundedRect(w * 0.26, h * 0.26, w * 0.48, h * 0.48, 2, 2)
+            c.fill()
+        } else if (kind === "sync") {
+            var sx = w * 0.5, sy = h * 0.5, sr = w * 0.34
+            var head = w * 0.14
+            var span = Math.PI * 0.72
+            // Arrowheads end at the top right and bottom left, each arc leaves a gap behind its head
+            for (var a = 0; a < 2; a++) {
+                var end = -Math.PI * 0.25 + a * Math.PI
+                c.beginPath()
+                c.arc(sx, sy, sr, end - span, end)
+                c.stroke()
+                var ex = sx + Math.cos(end) * sr, ey = sy + Math.sin(end) * sr
+                var tx = -Math.sin(end), ty = Math.cos(end)
+                var nx = Math.cos(end), ny = Math.sin(end)
+                c.beginPath()
+                c.moveTo(ex - tx * head * 0.2 + nx * head, ey - ty * head * 0.2 + ny * head)
+                c.lineTo(ex + tx * head * 0.9, ey + ty * head * 0.9)
+                c.lineTo(ex - tx * head * 0.2 - nx * head, ey - ty * head * 0.2 - ny * head)
+                c.stroke()
+            }
         } else if (kind === "chevron") {
             c.beginPath()
             c.moveTo(w * 0.3, h * 0.38); c.lineTo(w * 0.5, h * 0.62); c.lineTo(w * 0.7, h * 0.38)

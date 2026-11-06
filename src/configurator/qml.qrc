@@ -10,6 +10,7 @@
     <file>qml/components/PillButton.qml</file>
     <file>qml/components/Segmented.qml</file>
     <file>qml/components/TextBox.qml</file>
+    <file>qml/components/IconButton.qml</file>
     <file>qml/components/TabButton.qml</file>
     <file>qml/components/Toggle.qml</file>
     <file>qml/pages/ChannelRect.qml</file>

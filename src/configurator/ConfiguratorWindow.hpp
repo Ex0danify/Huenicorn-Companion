@@ -6,6 +6,7 @@
 #include "configurator/ConfiguratorModel.hpp"
 #include "i18n/Localization.hpp"
 #include "installer/DaemonInstaller.hpp"
+#include "preferences/AppPreferences.hpp"
 #include "updater/UpdateController.hpp"
 
 class QQuickWindow;
@@ -16,7 +17,7 @@ class ConfiguratorWindow : public QObject
   Q_OBJECT
 
 public:
-  ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, Localization& localization, QObject* parent = nullptr);
+  ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, Localization& localization, AppPreferences& preferences, QObject* parent = nullptr);
 
   ConfiguratorModel& model();
   QQuickWindow* window();

@@ -4,7 +4,7 @@
 #include <QQmlError>
 #include <QQuickWindow>
 
-ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, Localization& localization, QObject* parent)
+ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, Localization& localization, AppPreferences& preferences, QObject* parent)
   : QObject(parent)
   , m_model(controller)
 {
@@ -14,6 +14,7 @@ ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateContr
   m_engine.rootContext()->setContextProperty("updater", &updater);
   m_engine.rootContext()->setContextProperty("installer", &installer);
   m_engine.rootContext()->setContextProperty("localization", &localization);
+  m_engine.rootContext()->setContextProperty("preferences", &preferences);
   connect(&localization, &Localization::changed, &m_engine, &QQmlEngine::retranslate);
 }
 

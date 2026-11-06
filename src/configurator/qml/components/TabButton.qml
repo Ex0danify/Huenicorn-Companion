@@ -12,6 +12,8 @@ Item {
 
     implicitWidth: 76
     implicitHeight: 92
+    opacity: enabled ? 1 : 0.4
+    Behavior on opacity { NumberAnimation { duration: 140 } }
 
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -20,7 +22,7 @@ Item {
         Rectangle {
             width: 62; height: 62; radius: 31
             anchors.horizontalCenter: parent.horizontalCenter
-            color: root.selected ? "white" : (area.containsMouse ? Theme.surfaceHover : Theme.surfaceRaised)
+            color: root.selected ? "white" : (area.containsMouse && root.enabled ? Theme.surfaceHover : Theme.surfaceRaised)
             Behavior on color { ColorAnimation { duration: 140 } }
 
             Icon {
@@ -43,7 +45,8 @@ Item {
         id: area
         anchors.fill: parent
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+        enabled: root.enabled
+        cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         onClicked: root.clicked()
     }
 }

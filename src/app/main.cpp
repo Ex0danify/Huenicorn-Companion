@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
 #include <QStandardPaths>
@@ -9,6 +10,7 @@
 #include "daemon/DaemonController.hpp"
 #include "i18n/Localization.hpp"
 #include "installer/DaemonInstaller.hpp"
+#include "preferences/AppPreferences.hpp"
 #include "settings/Settings.hpp"
 #include "tray/TrayApp.hpp"
 #include "updater/UpdateController.hpp"
@@ -56,8 +58,21 @@ int main(int argc, char* argv[])
 
   TrayApp tray(controller, settings);
   QObject::connect(&localization, &Localization::changed, &tray, &TrayApp::retranslate);
-  ConfiguratorWindow configurator(controller, updater, installer, localization);
+  AppPreferences preferences(settings);
+  ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
   QObject::connect(&tray, &TrayApp::configuratorRequested, &configurator, &ConfiguratorWindow::show);
+  QObject::connect(&configurator.model(), &ConfiguratorModel::chooseDaemonRequested, [&](){
+    // A running daemon keeps its binary, the new path is for the next start
+    if(!controller.canChangeBinary()){
+      return;
+    }
+    const auto path = QFileDialog::getOpenFileName(nullptr, QCoreApplication::translate("App", "Select huenicorn binary"), controller.daemonPath());
+    if(path.isEmpty() || !controller.canChangeBinary()){
+      return;
+    }
+    settings.setDaemonPath(path);
+    controller.setDaemonPath(path);
+  });
 
   tray.setPreQuitStep([&configurator](TrayApp::Continuation proceed){
     configurator.model().flushThen(std::move(proceed));

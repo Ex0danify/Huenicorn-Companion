@@ -12,6 +12,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Select huenicorn binary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Huenicorn Companion update available</source>
         <translation type="unfinished"></translation>
     </message>
@@ -103,6 +107,10 @@
     </message>
     <message>
         <source>Huenicorn daemon binary not found. Set its path in the settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Huenicorn daemon binary not found or not executable: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -199,6 +207,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Configured binary not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Needed to build it (%1 session)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -251,7 +263,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Already installed somewhere else? Pick it in the tray menu under Settings, Choose daemon binary.</source>
+        <source>Already installed somewhere else?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose existing binary...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -307,6 +323,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Could not update the autostart entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Could not save profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -323,14 +343,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Saving…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -344,10 +356,6 @@
     </message>
     <message>
         <source>Lights</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -408,6 +416,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Available while light sync is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%1  %2%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -440,7 +452,31 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Change binary...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Open Web-Configurator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop light sync to change the binary. The new one is used the next time it starts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start light sync on app start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launch at login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop daemon when quitting</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -625,7 +661,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop light sync</source>
+        <source>Stop Sync</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -637,7 +673,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start light sync</source>
+        <source>Reconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Sync</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -660,23 +700,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Configurator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Web-Configurator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Launch at login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -688,23 +712,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not update the autostart entry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start light sync on app start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop daemon when quitting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose daemon binary...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Companion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -725,10 +737,6 @@
     </message>
     <message>
         <source>Huenicorn: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select huenicorn binary</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

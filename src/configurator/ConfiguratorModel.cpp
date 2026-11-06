@@ -35,6 +35,7 @@ ConfiguratorModel::ConfiguratorModel(DaemonController& controller, QObject* pare
 
   connect(&m_controller, &DaemonController::stateChanged, this, &ConfiguratorModel::onDaemonState);
   connect(&m_controller, &DaemonController::daemonPathChanged, this, &ConfiguratorModel::daemonPathChanged);
+  connect(&m_controller, &DaemonController::daemonPathChanged, this, &ConfiguratorModel::canStartChanged);
   connect(&m_setup, &SetupController::modeChanged, this, [this](){
     if(m_setup.ready() && running()){
       m_api.setBaseUrl(m_controller.baseUrl());
@@ -88,6 +89,7 @@ bool ConfiguratorModel::busy() const
 
 QString ConfiguratorModel::version() const { return m_controller.version(); }
 bool ConfiguratorModel::loaded() const { return m_loaded; }
+bool ConfiguratorModel::hasLoaded() const { return m_hasLoaded; }
 bool ConfiguratorModel::dirty() const { return m_dirty; }
 bool ConfiguratorModel::saving() const { return m_saving || m_saveTimer.isActive(); }
 QVariantList ConfiguratorModel::areas() const { return m_areas; }
@@ -103,6 +105,8 @@ double ConfiguratorModel::smoothing() const { return m_smoothing; }
 QVariantList ConfiguratorModel::interpolations() const { return m_interpolations; }
 int ConfiguratorModel::interpolation() const { return m_interpolation; }
 QString ConfiguratorModel::daemonPath() const { return m_controller.daemonPath(); }
+bool ConfiguratorModel::canStart() const { return m_controller.canStart(); }
+bool ConfiguratorModel::canChangeBinary() const { return m_controller.canChangeBinary(); }
 int ConfiguratorModel::port() const { return m_controller.port(); }
 SetupController* ConfiguratorModel::setup() { return &m_setup; }
 
@@ -132,6 +136,7 @@ int ConfiguratorModel::activeChannelCount() const
 void ConfiguratorModel::onDaemonState()
 {
   emit daemonStateChanged();
+  emit canStartChanged();
 
   // Loading waits for the setup probe, a daemon in setup mode lacks the normal API
   if(running()){
@@ -166,6 +171,7 @@ void ConfiguratorModel::setLoaded(bool loaded)
 {
   if(m_loaded != loaded){
     m_loaded = loaded;
+    m_hasLoaded = m_hasLoaded || loaded;
     emit loadedChanged();
   }
 }
@@ -230,6 +236,20 @@ void ConfiguratorModel::toggleDaemon()
   else if(state == State::Stopped || state == State::Error){
     m_controller.start();
   }
+}
+
+
+void ConfiguratorModel::reconnect()
+{
+  // The binary may have been restored or removed since the last state change
+  emit canStartChanged();
+  m_controller.checkNow();
+}
+
+
+void ConfiguratorModel::chooseDaemon()
+{
+  emit chooseDaemonRequested();
 }
 
 
@@ -435,6 +455,10 @@ void ConfiguratorModel::setChannelGamma(int channelId, double gamma)
 
 void ConfiguratorModel::setSubsampleWidth(int width)
 {
+  if(width == m_subsampleWidth){
+    return;
+  }
+
   m_api.put("/api/setSubsampleWidth", width, [this](bool ok, const QJsonDocument& doc){
     if(!ok){
       fail(tr("Could not set resolution"));
@@ -450,6 +474,9 @@ void ConfiguratorModel::setSubsampleWidth(int width)
 void ConfiguratorModel::setRefreshRate(int rate)
 {
   rate = qBound(1, rate, m_maxRefreshRate);
+  if(rate == m_refreshRate){
+    return;
+  }
   m_refreshRate = rate;
   emit settingsChanged();
 
@@ -467,6 +494,9 @@ void ConfiguratorModel::setRefreshRate(int rate)
 
 void ConfiguratorModel::setInterpolation(int interpolation)
 {
+  if(interpolation == m_interpolation){
+    return;
+  }
   m_interpolation = interpolation;
   emit settingsChanged();
 
@@ -484,6 +514,9 @@ void ConfiguratorModel::setInterpolation(int interpolation)
 void ConfiguratorModel::setSmoothing(double percent)
 {
   percent = qBound(0.0, percent, 95.0);
+  if(qFuzzyCompare(percent + 1, m_smoothing + 1)){
+    return;
+  }
   m_smoothing = percent;
   emit settingsChanged();
 

@@ -17,8 +17,10 @@ Window {
     onVisibleChanged: if(!visible) backend.flush()
 
     property int tab: 0
+    property int previousTab: 0
+    onTabChanged: if(tab !== 3) previousTab = tab
     // Nothing to talk to and nothing to start
-    readonly property bool daemonMissing: backend.daemonPath === "" && !backend.running
+    readonly property bool daemonMissing: !backend.canStart && !backend.running
     property string toastText: ""
 
     // Lets tools and tests preselect a channel on the screen page
@@ -36,9 +38,20 @@ Window {
     }
 
     Connections {
+        target: preferences
+        function onLaunchAtLoginFailed() { window.toast(qsTr("Could not update the autostart entry")) }
+    }
+
+    Connections {
         target: backend
-        function onSaved(ok) { if(!ok) window.toast(qsTr("Could not save profile")) }
+        function onSaved(ok) {
+            saveStatus.failed = !ok
+            saveStatus.confirmed = ok
+            if(ok) confirmTimer.restart()
+        }
         function onRequestFailed(message) { window.toast(message) }
+        // Screen and Lights are disabled without a daemon
+        function onDaemonStateChanged() { if(!backend.running && (window.tab === 1 || window.tab === 2)) window.tab = 0 }
     }
 
     // Soft glow behind the header
@@ -100,11 +113,29 @@ Window {
             }
         }
 
-        Text {
+        IconButton {
+            id: settingsButton
+            objectName: "settingsButton"
             anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-            visible: backend.running && !backend.setup.active
-            text: backend.saving ? qsTr("Saving…") : (backend.dirty ? qsTr("Not saved") : qsTr("Saved"))
-            color: Theme.textDim
+            visible: !backend.setup.active && !window.daemonMissing
+            icon: "cog"
+            active: window.tab === 3
+            onClicked: window.tab = window.tab === 3 ? window.previousTab : 3
+        }
+
+        Text {
+            id: saveStatus
+            objectName: "saveStatus"
+            // Saved fades out, a failure stays until the next save goes through
+            property bool confirmed: false
+            property bool failed: false
+            anchors { right: settingsButton.visible ? settingsButton.left : parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }
+            opacity: confirmed || failed ? 1 : 0
+            visible: backend.running && !backend.setup.active && opacity > 0
+            Behavior on opacity { NumberAnimation { duration: 400 } }
+            Timer { id: confirmTimer; interval: 3000; onTriggered: saveStatus.confirmed = false }
+            text: failed ? qsTr("Could not save profile") : qsTr("Saved")
+            color: failed ? Theme.danger : Theme.success
             font.pixelSize: Theme.fontBody
         }
     }
@@ -146,10 +177,9 @@ Window {
             anchors.centerIn: parent
             spacing: 14
 
-            TabButton { label: qsTr("Sync"); icon: "play"; selected: window.tab === 0; onClicked: window.tab = 0 }
-            TabButton { label: qsTr("Screen"); icon: "screen"; selected: window.tab === 1; onClicked: window.tab = 1 }
-            TabButton { label: qsTr("Lights"); icon: "bulb"; selected: window.tab === 2; onClicked: window.tab = 2 }
-            TabButton { label: qsTr("Settings"); icon: "sliders"; selected: window.tab === 3; onClicked: window.tab = 3 }
+            TabButton { label: qsTr("Sync"); icon: "sync"; selected: window.tab === 0; onClicked: window.tab = 0 }
+            TabButton { objectName: "tabScreen"; enabled: backend.running; label: qsTr("Screen"); icon: "screen"; selected: window.tab === 1; onClicked: window.tab = 1 }
+            TabButton { objectName: "tabLights"; enabled: backend.running; label: qsTr("Lights"); icon: "bulb"; selected: window.tab === 2; onClicked: window.tab = 2 }
         }
     }
 

@@ -12,6 +12,10 @@
         <translation>Auf diesem Desktop ist kein Systemtray verfügbar.</translation>
     </message>
     <message>
+        <source>Select huenicorn binary</source>
+        <translation>Huenicorn-Programm auswählen</translation>
+    </message>
+    <message>
         <source>Huenicorn Companion update available</source>
         <translation>Huenicorn-Companion-Update verfügbar</translation>
     </message>
@@ -104,6 +108,10 @@
     <message>
         <source>Huenicorn daemon binary not found. Set its path in the settings.</source>
         <translation>Das Huenicorn-Daemon-Programm wurde nicht gefunden. Lege den Pfad in den Einstellungen fest.</translation>
+    </message>
+    <message>
+        <source>Huenicorn daemon binary not found or not executable: %1</source>
+        <translation>Huenicorn-Daemon nicht gefunden oder nicht ausführbar: %1</translation>
     </message>
     <message>
         <source>Daemon exited unexpectedly (code %1)</source>
@@ -199,6 +207,10 @@
         <translation>Der Huenicorn-Daemon übernimmt die eigentliche Licht-Synchronisation. Diese App kann Version %1 aus dem Quellcode bauen und für deinen Benutzer installieren.</translation>
     </message>
     <message>
+        <source>Configured binary not found: %1</source>
+        <translation>Konfiguriertes Programm nicht gefunden: %1</translation>
+    </message>
+    <message>
         <source>Needed to build it (%1 session)</source>
         <translation>Zum Bauen benötigt (%1-Sitzung)</translation>
     </message>
@@ -251,8 +263,12 @@
         <translation>Installiert nach %1.</translation>
     </message>
     <message>
-        <source>Already installed somewhere else? Pick it in the tray menu under Settings, Choose daemon binary.</source>
-        <translation>Schon anderswo installiert? Wähle es im Tray-Menü unter Einstellungen, Daemon-Programm auswählen.</translation>
+        <source>Already installed somewhere else?</source>
+        <translation>Schon anderswo installiert?</translation>
+    </message>
+    <message>
+        <source>Choose existing binary...</source>
+        <translation>Vorhandenes Programm auswählen...</translation>
     </message>
 </context>
 <context>
@@ -307,6 +323,10 @@
         <translation>Huenicorn</translation>
     </message>
     <message>
+        <source>Could not update the autostart entry</source>
+        <translation>Der Autostart-Eintrag konnte nicht aktualisiert werden</translation>
+    </message>
+    <message>
         <source>Could not save profile</source>
         <translation>Profil konnte nicht gespeichert werden</translation>
     </message>
@@ -323,14 +343,6 @@
         <translation>mit Daemon</translation>
     </message>
     <message>
-        <source>Saving…</source>
-        <translation>Wird gespeichert…</translation>
-    </message>
-    <message>
-        <source>Not saved</source>
-        <translation>Nicht gespeichert</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Gespeichert</translation>
     </message>
@@ -345,10 +357,6 @@
     <message>
         <source>Lights</source>
         <translation>Lichter</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -408,6 +416,10 @@
         <translation>Niedrigere Werte benötigen weniger CPU. Höhere Werte folgen feinen Details besser.</translation>
     </message>
     <message>
+        <source>Available while light sync is running.</source>
+        <translation>Verfügbar, solange der Licht-Sync läuft.</translation>
+    </message>
+    <message>
         <source>%1  %2%</source>
         <translation>%1  %2 %</translation>
     </message>
@@ -440,8 +452,32 @@
         <translation>REST-Port</translation>
     </message>
     <message>
+        <source>Change binary...</source>
+        <translation>Programm ändern...</translation>
+    </message>
+    <message>
         <source>Open Web-Configurator</source>
         <translation>Web-Konfigurator öffnen</translation>
+    </message>
+    <message>
+        <source>Stop light sync to change the binary. The new one is used the next time it starts.</source>
+        <translation>Stoppe den Licht-Sync, um das Programm zu ändern. Das neue wird beim nächsten Start verwendet.</translation>
+    </message>
+    <message>
+        <source>Startup</source>
+        <translation>Start</translation>
+    </message>
+    <message>
+        <source>Start light sync on app start</source>
+        <translation>Licht-Sync beim Start der App starten</translation>
+    </message>
+    <message>
+        <source>Launch at login</source>
+        <translation>Beim Anmelden starten</translation>
+    </message>
+    <message>
+        <source>Stop daemon when quitting</source>
+        <translation>Daemon beim Beenden stoppen</translation>
     </message>
 </context>
 <context>
@@ -625,8 +661,8 @@
         <translation>%1 Hz</translation>
     </message>
     <message>
-        <source>Stop light sync</source>
-        <translation>Licht-Sync stoppen</translation>
+        <source>Stop Sync</source>
+        <translation>Sync stoppen</translation>
     </message>
     <message>
         <source>Starting...</source>
@@ -637,8 +673,12 @@
         <translation>Wird beendet...</translation>
     </message>
     <message>
-        <source>Start light sync</source>
-        <translation>Licht-Sync starten</translation>
+        <source>Reconnect</source>
+        <translation>Neu verbinden</translation>
+    </message>
+    <message>
+        <source>Start Sync</source>
+        <translation>Sync starten</translation>
     </message>
 </context>
 <context>
@@ -660,28 +700,8 @@
         <translation>Neu starten</translation>
     </message>
     <message>
-        <source>Open Configurator</source>
-        <translation>Konfigurator öffnen</translation>
-    </message>
-    <message>
-        <source>Open Web-Configurator</source>
-        <translation>Web-Konfigurator öffnen</translation>
-    </message>
-    <message>
         <source>Show log</source>
         <translation>Protokoll anzeigen</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
-    </message>
-    <message>
-        <source>Start light sync on app start</source>
-        <translation>Licht-Sync beim Start der App starten</translation>
-    </message>
-    <message>
-        <source>Launch at login</source>
-        <translation>Beim Anmelden starten</translation>
     </message>
     <message>
         <source>Syncing</source>
@@ -692,20 +712,12 @@
         <translation>Synchronisiert (v%1)</translation>
     </message>
     <message>
-        <source>Could not update the autostart entry</source>
-        <translation>Der Autostart-Eintrag konnte nicht aktualisiert werden</translation>
-    </message>
-    <message>
-        <source>Stop daemon when quitting</source>
-        <translation>Daemon beim Beenden stoppen</translation>
-    </message>
-    <message>
-        <source>Choose daemon binary...</source>
-        <translation>Daemon-Programm auswählen...</translation>
-    </message>
-    <message>
         <source>Quit</source>
         <translation>Beenden</translation>
+    </message>
+    <message>
+        <source>Open Companion</source>
+        <translation>Companion öffnen</translation>
     </message>
     <message>
         <source>Stopped</source>
@@ -726,10 +738,6 @@
     <message>
         <source>Huenicorn: %1</source>
         <translation>Huenicorn: %1</translation>
-    </message>
-    <message>
-        <source>Select huenicorn binary</source>
-        <translation>Huenicorn-Programm auswählen</translation>
     </message>
 </context>
 <context>

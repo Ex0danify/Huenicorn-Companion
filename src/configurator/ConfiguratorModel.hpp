@@ -24,6 +24,8 @@ class ConfiguratorModel : public QObject
   Q_PROPERTY(bool busy READ busy NOTIFY daemonStateChanged)
   Q_PROPERTY(QString version READ version NOTIFY daemonStateChanged)
   Q_PROPERTY(bool loaded READ loaded NOTIFY loadedChanged)
+  // True once real values arrived, they stay available after the daemon stops
+  Q_PROPERTY(bool hasLoaded READ hasLoaded NOTIFY loadedChanged)
   Q_PROPERTY(bool dirty READ dirty NOTIFY dirtyChanged)
   Q_PROPERTY(bool saving READ saving NOTIFY dirtyChanged)
 
@@ -45,6 +47,8 @@ class ConfiguratorModel : public QObject
   Q_PROPERTY(int interpolation READ interpolation NOTIFY settingsChanged)
 
   Q_PROPERTY(QString daemonPath READ daemonPath NOTIFY daemonPathChanged)
+  Q_PROPERTY(bool canStart READ canStart NOTIFY canStartChanged)
+  Q_PROPERTY(bool canChangeBinary READ canChangeBinary NOTIFY daemonStateChanged)
   Q_PROPERTY(int port READ port NOTIFY daemonStateChanged)
 
   Q_PROPERTY(SetupController* setup READ setup CONSTANT)
@@ -58,6 +62,7 @@ public:
   bool busy() const;
   QString version() const;
   bool loaded() const;
+  bool hasLoaded() const;
   bool dirty() const;
   bool saving() const;
 
@@ -79,11 +84,15 @@ public:
   int interpolation() const;
 
   QString daemonPath() const;
+  bool canStart() const;
+  bool canChangeBinary() const;
   int port() const;
   SetupController* setup();
 
   Q_INVOKABLE void refresh();
   Q_INVOKABLE void toggleDaemon();
+  Q_INVOKABLE void reconnect();
+  Q_INVOKABLE void chooseDaemon();
   Q_INVOKABLE void selectArea(const QString& areaId);
   Q_INVOKABLE void setChannelActive(int channelId, bool active);
   Q_INVOKABLE void setChannelRect(int channelId, double x0, double y0, double x1, double y1);
@@ -103,6 +112,8 @@ public:
 signals:
   void daemonStateChanged();
   void daemonPathChanged();
+  void canStartChanged();
+  void chooseDaemonRequested();
   void loadedChanged();
   void dirtyChanged();
   void areasChanged();
@@ -129,6 +140,7 @@ private:
   SetupController m_setup;
 
   bool m_loaded{false};
+  bool m_hasLoaded{false};
   bool m_dirty{false};
   int m_pending{0};
   bool m_saving{false};

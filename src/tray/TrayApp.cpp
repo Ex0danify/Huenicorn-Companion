@@ -1,11 +1,8 @@
 #include "tray/TrayApp.hpp"
 
 #include <QApplication>
-#include <QDesktopServices>
-#include <QFileDialog>
 #include <QMessageBox>
 
-#include "settings/Autostart.hpp"
 #include "tray/IconFactory.hpp"
 
 
@@ -61,8 +58,7 @@ void TrayApp::notify(const QString& title, const QString& message)
 
 void TrayApp::buildMenu()
 {
-  m_statusAction = m_menu.addAction(QString());
-  m_statusAction->setEnabled(false);
+  m_openConfiguratorAction = m_menu.addAction(QString(), this, &TrayApp::configuratorRequested);
   m_menu.addSeparator();
 
   m_startAction = m_menu.addAction(QString(), this, [this](){
@@ -74,46 +70,11 @@ void TrayApp::buildMenu()
   m_restartAction = m_menu.addAction(QString(), &m_controller, &DaemonController::restart);
   m_menu.addSeparator();
 
-  m_openConfiguratorAction = m_menu.addAction(QString(), this, &TrayApp::configuratorRequested);
-  m_webConfigAction = m_menu.addAction(QString(), this, &TrayApp::openWebConfigurator);
   m_logAction = m_menu.addAction(QString(), this, [this](){
     m_log.show();
     m_log.raise();
     m_log.activateWindow();
   });
-  m_menu.addSeparator();
-
-  m_settingsMenu = m_menu.addMenu(QString());
-  auto* settings = m_settingsMenu;
-  m_autostartDaemonAction = settings->addAction(QString());
-  m_autostartDaemonAction->setCheckable(true);
-  m_autostartDaemonAction->setChecked(m_settings.autostartDaemon());
-  connect(m_autostartDaemonAction, &QAction::toggled, this, [this](bool on){
-    m_settings.setAutostartDaemon(on);
-  });
-
-  m_autostartLoginAction = settings->addAction(QString());
-  m_autostartLoginAction->setCheckable(true);
-  m_autostartLoginAction->setChecked(Autostart::isEnabled());
-  connect(m_autostartLoginAction, &QAction::toggled, this, [this](bool on){
-    if(!Autostart::setEnabled(on)){
-      QSignalBlocker blocker(m_autostartLoginAction);
-      m_autostartLoginAction->setChecked(!on);
-      m_tray.showMessage(tr("Huenicorn"), tr("Could not update the autostart entry"), QSystemTrayIcon::Warning);
-    }
-  });
-
-  m_stopOnQuitAction = settings->addAction(QString());
-  m_stopOnQuitAction->setCheckable(true);
-  m_stopOnQuitAction->setChecked(m_settings.stopDaemonOnQuit());
-  connect(m_stopOnQuitAction, &QAction::toggled, this, [this](bool on){
-    m_settings.setStopDaemonOnQuit(on);
-  });
-
-  settings->addSeparator();
-  m_chooseDaemonAction = settings->addAction(QString(), this, &TrayApp::chooseDaemon);
-
-  m_menu.addSeparator();
   m_quitAction = m_menu.addAction(QString(), this, &TrayApp::quit);
 
   retranslate();
@@ -125,14 +86,8 @@ void TrayApp::retranslate()
   m_startAction->setText(tr("Start"));
   m_stopAction->setText(tr("Stop"));
   m_restartAction->setText(tr("Restart"));
-  m_openConfiguratorAction->setText(tr("Open Configurator"));
-  m_webConfigAction->setText(tr("Open Web-Configurator"));
+  m_openConfiguratorAction->setText(tr("Open Companion"));
   m_logAction->setText(tr("Show log"));
-  m_settingsMenu->setTitle(tr("Settings"));
-  m_autostartDaemonAction->setText(tr("Start light sync on app start"));
-  m_autostartLoginAction->setText(tr("Launch at login"));
-  m_stopOnQuitAction->setText(tr("Stop daemon when quitting"));
-  m_chooseDaemonAction->setText(tr("Choose daemon binary..."));
   m_quitAction->setText(tr("Quit"));
   refresh();
 }
@@ -154,38 +109,13 @@ void TrayApp::refresh()
     case Error: text = tr("Error: %1").arg(m_controller.lastError()); break;
   }
 
-  // The error is already in the toast, tooltip and log, and a long one stretches the menu
-  m_statusAction->setVisible(state != Error);
-  m_statusAction->setText(text);
   m_tray.setIcon(IconFactory::forState(state));
   m_tray.setToolTip(tr("Huenicorn: %1").arg(text));
 
   const bool idle = (state == Stopped || state == Error);
-  const bool busy = (state == Starting || state == Stopping);
   m_startAction->setEnabled(idle);
   m_stopAction->setEnabled(!idle && state != Stopping);
-  m_restartAction->setEnabled(!busy);
-  m_webConfigAction->setEnabled(state == Running);
-}
-
-
-void TrayApp::openWebConfigurator() const
-{
-  if(m_controller.state() == DaemonController::State::Running){
-    QDesktopServices::openUrl(m_controller.baseUrl());
-  }
-}
-
-
-void TrayApp::chooseDaemon()
-{
-  const auto path = QFileDialog::getOpenFileName(nullptr, tr("Select huenicorn binary"), m_controller.daemonPath());
-  if(path.isEmpty()){
-    return;
-  }
-
-  m_settings.setDaemonPath(path);
-  m_controller.setDaemonPath(path);
+  m_restartAction->setEnabled(state == Running);
 }
 
 

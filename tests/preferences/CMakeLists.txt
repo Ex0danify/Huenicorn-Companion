@@ -1,0 +1,3 @@
+add_executable(TestAppPreferences TestAppPreferences.cpp)
+target_link_libraries(TestAppPreferences PRIVATE huenicorn_preferences Qt6::Test)
+add_test(NAME AppPreferences COMMAND TestAppPreferences)

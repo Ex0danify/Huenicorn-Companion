@@ -55,6 +55,15 @@ Item {
                         wrapMode: Text.WordWrap
                     }
 
+                    Text {
+                        width: parent.width
+                        visible: backend.daemonPath !== ""
+                        text: qsTr("Configured binary not found: %1").arg(backend.daemonPath)
+                        color: Theme.warning
+                        font.pixelSize: Theme.fontBody
+                        wrapMode: Text.WrapAnywhere
+                    }
+
                     // Something needed for the build is missing
                     Column {
                         width: parent.width
@@ -259,10 +268,21 @@ Item {
                     Text {
                         width: parent.width
                         visible: page.phase !== "building" && page.phase !== "installed"
-                        text: qsTr("Already installed somewhere else? Pick it in the tray menu under Settings, Choose daemon binary.")
+                        text: qsTr("Already installed somewhere else?")
                         color: Theme.textDim
                         font.pixelSize: Theme.fontSmall + 1
                         wrapMode: Text.WordWrap
+                    }
+
+                    PillButton {
+                        objectName: "chooseBinaryButton"
+                        visible: page.phase !== "building" && page.phase !== "installed"
+                        text: qsTr("Choose existing binary...")
+                        fill: Theme.surfaceHover
+                        textColor: Theme.text
+                        fontSize: Theme.fontBody
+                        implicitHeight: 42
+                        onClicked: backend.chooseDaemon()
                     }
                 }
             }
