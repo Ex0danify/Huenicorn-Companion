@@ -1,7 +1,6 @@
 #include "tray/TrayApp.hpp"
 
 #include <QApplication>
-#include <QDesktopServices>
 #include <QMessageBox>
 
 #include "tray/IconFactory.hpp"
@@ -59,8 +58,7 @@ void TrayApp::notify(const QString& title, const QString& message)
 
 void TrayApp::buildMenu()
 {
-  m_statusAction = m_menu.addAction(QString());
-  m_statusAction->setEnabled(false);
+  m_openConfiguratorAction = m_menu.addAction(QString(), this, &TrayApp::configuratorRequested);
   m_menu.addSeparator();
 
   m_startAction = m_menu.addAction(QString(), this, [this](){
@@ -72,15 +70,11 @@ void TrayApp::buildMenu()
   m_restartAction = m_menu.addAction(QString(), &m_controller, &DaemonController::restart);
   m_menu.addSeparator();
 
-  m_openConfiguratorAction = m_menu.addAction(QString(), this, &TrayApp::configuratorRequested);
-  m_webConfigAction = m_menu.addAction(QString(), this, &TrayApp::openWebConfigurator);
   m_logAction = m_menu.addAction(QString(), this, [this](){
     m_log.show();
     m_log.raise();
     m_log.activateWindow();
   });
-  m_menu.addSeparator();
-
   m_quitAction = m_menu.addAction(QString(), this, &TrayApp::quit);
 
   retranslate();
@@ -92,8 +86,7 @@ void TrayApp::retranslate()
   m_startAction->setText(tr("Start"));
   m_stopAction->setText(tr("Stop"));
   m_restartAction->setText(tr("Restart"));
-  m_openConfiguratorAction->setText(tr("Open Configurator"));
-  m_webConfigAction->setText(tr("Open Web-Configurator"));
+  m_openConfiguratorAction->setText(tr("Open Companion"));
   m_logAction->setText(tr("Show log"));
   m_quitAction->setText(tr("Quit"));
   refresh();
@@ -116,26 +109,13 @@ void TrayApp::refresh()
     case Error: text = tr("Error: %1").arg(m_controller.lastError()); break;
   }
 
-  // The error is already in the toast, tooltip and log, and a long one stretches the menu
-  m_statusAction->setVisible(state != Error);
-  m_statusAction->setText(text);
   m_tray.setIcon(IconFactory::forState(state));
   m_tray.setToolTip(tr("Huenicorn: %1").arg(text));
 
   const bool idle = (state == Stopped || state == Error);
-  const bool busy = (state == Starting || state == Stopping);
   m_startAction->setEnabled(idle);
   m_stopAction->setEnabled(!idle && state != Stopping);
-  m_restartAction->setEnabled(!busy);
-  m_webConfigAction->setEnabled(state == Running);
-}
-
-
-void TrayApp::openWebConfigurator() const
-{
-  if(m_controller.state() == DaemonController::State::Running){
-    QDesktopServices::openUrl(m_controller.baseUrl());
-  }
+  m_restartAction->setEnabled(state == Running);
 }
 
 

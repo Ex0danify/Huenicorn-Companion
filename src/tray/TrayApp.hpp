@@ -31,6 +31,9 @@ public:
   using Continuation = std::function<void()>;
   void setPreQuitStep(std::function<void(Continuation)> step);
 
+  // For tests
+  const QMenu& menu() const { return m_menu; }
+
 signals:
   // The composition root decides what "configurator" means, the tray does not know
   void configuratorRequested();
@@ -38,7 +41,6 @@ signals:
 private:
   void buildMenu();
   void refresh();
-  void openWebConfigurator() const;
   void finishQuit();
 
   Settings& m_settings;
@@ -49,12 +51,10 @@ private:
   QSystemTrayIcon m_tray;
   QMenu m_menu;
 
-  QAction* m_statusAction{};
   QAction* m_startAction{};
   QAction* m_stopAction{};
   QAction* m_restartAction{};
   QAction* m_openConfiguratorAction{};
-  QAction* m_webConfigAction{};
   QAction* m_logAction{};
   QAction* m_quitAction{};
 };

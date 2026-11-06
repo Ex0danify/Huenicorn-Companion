@@ -704,14 +704,6 @@
         <translation>Neu starten</translation>
     </message>
     <message>
-        <source>Open Configurator</source>
-        <translation>Konfigurator öffnen</translation>
-    </message>
-    <message>
-        <source>Open Web-Configurator</source>
-        <translation>Web-Konfigurator öffnen</translation>
-    </message>
-    <message>
         <source>Show log</source>
         <translation>Protokoll anzeigen</translation>
     </message>
@@ -726,6 +718,10 @@
     <message>
         <source>Quit</source>
         <translation>Beenden</translation>
+    </message>
+    <message>
+        <source>Open Companion</source>
+        <translation>Companion öffnen</translation>
     </message>
     <message>
         <source>Stopped</source>

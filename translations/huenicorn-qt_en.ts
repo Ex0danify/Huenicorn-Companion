@@ -704,14 +704,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Configurator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Web-Configurator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -725,6 +717,10 @@
     </message>
     <message>
         <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Companion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
