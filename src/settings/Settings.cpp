@@ -122,6 +122,18 @@ void Settings::setSkippedUpdateVersion(const QString& version)
 }
 
 
+QString Settings::language() const
+{
+  return store().value("language", "auto").toString();
+}
+
+
+void Settings::setLanguage(const QString& language)
+{
+  store().setValue("language", language);
+}
+
+
 QString Settings::resolvedDaemonPath() const
 {
   const auto configured = daemonPath();

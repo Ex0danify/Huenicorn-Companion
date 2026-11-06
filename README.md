@@ -37,21 +37,21 @@ running. The web page keeps working alongside it.
 
 - Linux with a system tray (KDE Plasma, or GNOME with an AppIndicator extension)
 - [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn), or the build tools to let the app build it (see below)
-- Qt 6 (Widgets, Network, Quick), CMake 3.16 or newer and a C++20 compiler to build
+- Qt 6 (Widgets, Network, Quick, plus the Linguist tools to build the translations), CMake 3.16 or newer and a C++20 compiler to build
 
 Install the build requirements for your distribution:
 
 **Debian, Ubuntu**
 
 ```sh
-sudo apt install build-essential cmake libgl1-mesa-dev qt6-base-dev qt6-declarative-dev \
+sudo apt install build-essential cmake libgl1-mesa-dev qt6-base-dev qt6-declarative-dev qt6-tools-dev qt6-l10n-tools \
   qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
 ```
 
 **Fedora, RHEL, AlmaLinux, Rocky (dnf or yum)**
 
 ```sh
-sudo dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qtdeclarative-devel
+sudo dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qttools-devel
 ```
 
 On RHEL 9 and its clones, Qt 6 comes from EPEL, so enable that repository first.
@@ -59,7 +59,7 @@ On RHEL 9 and its clones, Qt 6 comes from EPEL, so enable that repository first.
 **Arch, Manjaro**
 
 ```sh
-sudo pacman -S --needed base-devel cmake qt6-base qt6-declarative
+sudo pacman -S --needed base-devel cmake qt6-base qt6-declarative qt6-tools
 ```
 
 ## Build and run
@@ -91,6 +91,24 @@ the development files of libcurl, OpenCV, Mbed TLS 3 or newer, plus X11 or PipeW
 | Start, stop, restart the daemon | Tray menu |
 | Open the browser configurator | Tray menu, or *Open Web-Configurator* in the Settings tab |
 | Change autostart, daemon path, quit behavior | Tray menu, *Settings* |
+
+## Translations
+
+English and German ship with the app. The language follows your system, or you can pick one under Settings, Language. The change applies right away.
+
+Each language is one file in `translations/`, named `huenicorn-qt_<code>.ts`. To add a language:
+
+```sh
+cp translations/huenicorn-qt_en.ts translations/huenicorn-qt_fr.ts
+# change language="en" to language="fr" in the new file, then
+cmake -S . -B build
+cmake --build build --target update_translations
+linguist-qt6 translations/huenicorn-qt_fr.ts
+```
+
+Reconfigure once so the build picks up the new file, then translate it in Qt Linguist or any text editor. Untranslated strings
+show in English. Keep placeholders like `%1` in every translation, the test suite checks this. Run `update_translations` after
+changing any user visible text in the code. Strings in the `.ts` files are grouped by class or QML file name.
 
 ## Credits
 

@@ -25,15 +25,15 @@ jobs:
           - name: fedora
             image: fedora:44
             generators: "RPM;TGZ"
-            deps: dnf install -y git cmake gcc-c++ make rpm-build qt6-qtbase-devel qt6-qtdeclarative-devel mesa-libGL-devel
+            deps: dnf install -y git cmake gcc-c++ make rpm-build qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qttools-devel mesa-libGL-devel
           - name: ubuntu-24.04
             image: ubuntu:24.04
             generators: DEB
-            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev qt6-tools-dev qt6-l10n-tools libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
           - name: debian-13
             image: debian:13
             generators: DEB
-            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
+            deps: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake g++ make dpkg-dev file qt6-base-dev qt6-declarative-dev qt6-tools-dev qt6-l10n-tools libgl1-mesa-dev qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtqml-workerscript
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install dependencies
@@ -72,7 +72,7 @@ jobs:
     container: archlinux:latest
     steps:
       - name: Install dependencies
-        run: pacman -Syu --noconfirm git base-devel cmake qt6-base qt6-declarative
+        run: pacman -Syu --noconfirm git base-devel cmake qt6-base qt6-declarative qt6-tools
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build package
         run: |

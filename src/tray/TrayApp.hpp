@@ -23,6 +23,9 @@ public:
 
   void notify(const QString& title, const QString& message);
 
+  // Menu texts are set once, so they have to be redone after a language switch
+  void retranslate();
+
   // Runs before quitting and must call the continuation when it is safe to go on.
   // Lets the composition root persist unsaved work without the tray knowing about it.
   using Continuation = std::function<void()>;
@@ -47,11 +50,16 @@ private:
   QSystemTrayIcon m_tray;
   QMenu m_menu;
 
+  QMenu* m_settingsMenu{};
   QAction* m_statusAction{};
   QAction* m_startAction{};
   QAction* m_stopAction{};
   QAction* m_restartAction{};
+  QAction* m_openConfiguratorAction{};
   QAction* m_webConfigAction{};
+  QAction* m_logAction{};
+  QAction* m_chooseDaemonAction{};
+  QAction* m_quitAction{};
   QAction* m_autostartLoginAction{};
   QAction* m_autostartDaemonAction{};
   QAction* m_stopOnQuitAction{};

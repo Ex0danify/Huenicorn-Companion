@@ -65,33 +65,34 @@ void TrayApp::buildMenu()
   m_statusAction->setEnabled(false);
   m_menu.addSeparator();
 
-  m_startAction = m_menu.addAction(tr("Start"), this, [this](){
+  m_startAction = m_menu.addAction(QString(), this, [this](){
     // The daemon config may have changed since the tray started
     m_controller.setPort(m_settings.port());
     m_controller.start();
   });
-  m_stopAction = m_menu.addAction(tr("Stop"), &m_controller, &DaemonController::stop);
-  m_restartAction = m_menu.addAction(tr("Restart"), &m_controller, &DaemonController::restart);
+  m_stopAction = m_menu.addAction(QString(), &m_controller, &DaemonController::stop);
+  m_restartAction = m_menu.addAction(QString(), &m_controller, &DaemonController::restart);
   m_menu.addSeparator();
 
-  m_menu.addAction(tr("Open Configurator"), this, &TrayApp::configuratorRequested);
-  m_webConfigAction = m_menu.addAction(tr("Open Web-Configurator"), this, &TrayApp::openWebConfigurator);
-  m_menu.addAction(tr("Show log"), this, [this](){
+  m_openConfiguratorAction = m_menu.addAction(QString(), this, &TrayApp::configuratorRequested);
+  m_webConfigAction = m_menu.addAction(QString(), this, &TrayApp::openWebConfigurator);
+  m_logAction = m_menu.addAction(QString(), this, [this](){
     m_log.show();
     m_log.raise();
     m_log.activateWindow();
   });
   m_menu.addSeparator();
 
-  auto* settings = m_menu.addMenu(tr("Settings"));
-  m_autostartDaemonAction = settings->addAction(tr("Start streaming when the tray starts"));
+  m_settingsMenu = m_menu.addMenu(QString());
+  auto* settings = m_settingsMenu;
+  m_autostartDaemonAction = settings->addAction(QString());
   m_autostartDaemonAction->setCheckable(true);
   m_autostartDaemonAction->setChecked(m_settings.autostartDaemon());
   connect(m_autostartDaemonAction, &QAction::toggled, this, [this](bool on){
     m_settings.setAutostartDaemon(on);
   });
 
-  m_autostartLoginAction = settings->addAction(tr("Launch at login"));
+  m_autostartLoginAction = settings->addAction(QString());
   m_autostartLoginAction->setCheckable(true);
   m_autostartLoginAction->setChecked(Autostart::isEnabled());
   connect(m_autostartLoginAction, &QAction::toggled, this, [this](bool on){
@@ -102,7 +103,7 @@ void TrayApp::buildMenu()
     }
   });
 
-  m_stopOnQuitAction = settings->addAction(tr("Stop daemon when quitting"));
+  m_stopOnQuitAction = settings->addAction(QString());
   m_stopOnQuitAction->setCheckable(true);
   m_stopOnQuitAction->setChecked(m_settings.stopDaemonOnQuit());
   connect(m_stopOnQuitAction, &QAction::toggled, this, [this](bool on){
@@ -110,10 +111,30 @@ void TrayApp::buildMenu()
   });
 
   settings->addSeparator();
-  settings->addAction(tr("Choose daemon binary..."), this, &TrayApp::chooseDaemon);
+  m_chooseDaemonAction = settings->addAction(QString(), this, &TrayApp::chooseDaemon);
 
   m_menu.addSeparator();
-  m_menu.addAction(tr("Quit"), this, &TrayApp::quit);
+  m_quitAction = m_menu.addAction(QString(), this, &TrayApp::quit);
+
+  retranslate();
+}
+
+
+void TrayApp::retranslate()
+{
+  m_startAction->setText(tr("Start"));
+  m_stopAction->setText(tr("Stop"));
+  m_restartAction->setText(tr("Restart"));
+  m_openConfiguratorAction->setText(tr("Open Configurator"));
+  m_webConfigAction->setText(tr("Open Web-Configurator"));
+  m_logAction->setText(tr("Show log"));
+  m_settingsMenu->setTitle(tr("Settings"));
+  m_autostartDaemonAction->setText(tr("Start light sync on app start"));
+  m_autostartLoginAction->setText(tr("Launch at login"));
+  m_stopOnQuitAction->setText(tr("Stop daemon when quitting"));
+  m_chooseDaemonAction->setText(tr("Choose daemon binary..."));
+  m_quitAction->setText(tr("Quit"));
+  refresh();
 }
 
 
@@ -127,7 +148,7 @@ void TrayApp::refresh()
     case Stopped: text = tr("Stopped"); break;
     case Starting: text = tr("Starting..."); break;
     case Running:
-      text = m_controller.version().isEmpty() ? tr("Streaming") : tr("Streaming (v%1)").arg(m_controller.version());
+      text = m_controller.version().isEmpty() ? tr("Syncing") : tr("Syncing (v%1)").arg(m_controller.version());
       break;
     case Stopping: text = tr("Stopping..."); break;
     case Error: text = tr("Error: %1").arg(m_controller.lastError()); break;

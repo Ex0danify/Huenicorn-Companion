@@ -27,7 +27,9 @@ int main(int argc, char* argv[])
   controller.setPollIntervalMs(100);
   UpdateController updater("0.1.0");
   DaemonInstaller installer(PinnedDaemon::current());
-  ConfiguratorWindow configurator(controller, updater, installer);
+  Settings settings;
+  Localization localization(settings);
+  ConfiguratorWindow configurator(controller, updater, installer, localization);
   auto* window = configurator.window();
   window->show();
   controller.beginMonitoring();

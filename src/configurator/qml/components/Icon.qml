@@ -64,6 +64,16 @@ Canvas {
             c.beginPath()
             c.moveTo(w * 0.3, h * 0.38); c.lineTo(w * 0.5, h * 0.62); c.lineTo(w * 0.7, h * 0.38)
             c.stroke()
+        } else if (kind === "globe") {
+            c.beginPath()
+            c.arc(w * 0.5, h * 0.5, w * 0.36, 0, Math.PI * 2)
+            c.stroke()
+            c.beginPath()
+            c.ellipse(w * 0.34, h * 0.14, w * 0.32, h * 0.72)
+            c.stroke()
+            c.beginPath()
+            c.moveTo(w * 0.14, h * 0.5); c.lineTo(w * 0.86, h * 0.5)
+            c.stroke()
         } else if (kind === "check") {
             c.beginPath()
             c.moveTo(w * 0.22, h * 0.54); c.lineTo(w * 0.43, h * 0.74); c.lineTo(w * 0.78, h * 0.28)

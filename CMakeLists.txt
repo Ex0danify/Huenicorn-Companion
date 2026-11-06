@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Network Quick)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network Quick LinguistTools)
 
 # Every module includes as "<module>/Header.hpp"
 include_directories(${PROJECT_SOURCE_DIR}/src)
@@ -19,6 +19,7 @@ add_subdirectory(src/api)
 add_subdirectory(src/daemon)
 add_subdirectory(src/setup)
 add_subdirectory(src/settings)
+add_subdirectory(src/i18n)
 add_subdirectory(src/updater)
 add_subdirectory(src/installer)
 add_subdirectory(src/tray)

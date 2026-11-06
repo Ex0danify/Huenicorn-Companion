@@ -7,6 +7,7 @@ target_link_libraries(huenicorn-qt PRIVATE
   huenicorn_daemon
   huenicorn_updater
   huenicorn_installer
+  huenicorn_i18n
 )
 target_compile_definitions(huenicorn-qt PRIVATE HUENICORN_QT_VERSION="${PROJECT_VERSION}")
 

@@ -4,7 +4,7 @@
 #include <QQmlError>
 #include <QQuickWindow>
 
-ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, QObject* parent)
+ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, Localization& localization, QObject* parent)
   : QObject(parent)
   , m_model(controller)
 {
@@ -13,6 +13,8 @@ ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateContr
   m_engine.rootContext()->setContextProperty("backend", &m_model);
   m_engine.rootContext()->setContextProperty("updater", &updater);
   m_engine.rootContext()->setContextProperty("installer", &installer);
+  m_engine.rootContext()->setContextProperty("localization", &localization);
+  connect(&localization, &Localization::changed, &m_engine, &QQmlEngine::retranslate);
 }
 
 

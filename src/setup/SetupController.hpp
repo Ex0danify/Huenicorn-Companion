@@ -47,7 +47,7 @@ public:
   QStringList bridges() const;
   QString bridgeAddress() const;
 
-  // Overrides the polling of the link button and the waiting on the daemon after setup finished
+  // Overrides the polling of the pairing button and the waiting on the daemon after setup finished
   void setRetryIntervalMs(int ms);
   void setFinishDelayMs(int ms);
 
