@@ -31,6 +31,8 @@ public:
   using Continuation = std::function<void()>;
   void setPreQuitStep(std::function<void(Continuation)> step);
 
+  void chooseDaemon();
+
 signals:
   // The composition root decides what "configurator" means, the tray does not know
   void configuratorRequested();
@@ -39,7 +41,6 @@ private:
   void buildMenu();
   void refresh();
   void openWebConfigurator() const;
-  void chooseDaemon();
   void finishQuit();
 
   Settings& m_settings;

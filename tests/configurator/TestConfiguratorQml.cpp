@@ -154,6 +154,47 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void missingBinaryShowsInstallPageAndChooser()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/nonexistent/huenicorn");
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->show();
+      QTest::qWait(100);
+
+      QVERIFY(!configurator.model().canStart());
+      QVERIFY(visibleTexts(window->contentItem()).contains("Choose existing binary..."));
+      QVERIFY(visibleTexts(window->contentItem()).contains("Configured binary not found: /nonexistent/huenicorn"));
+
+      auto* chooser = window->findChild<QQuickItem*>("chooseBinaryButton");
+      QVERIFY(chooser != nullptr);
+      QSignalSpy spy(&configurator.model(), &ConfiguratorModel::chooseDaemonRequested);
+      const QPointF p = chooser->mapToScene(QPointF(chooser->width() / 2, chooser->height() / 2));
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, p.toPoint());
+      QCOMPARE(spy.count(), 1);
+
+      // Picking a real binary swaps the install page for the sync page
+      controller.setDaemonPath("/usr/bin/true");
+      QTest::qWait(100);
+      QVERIFY(configurator.model().canStart());
+      QVERIFY(!visibleTexts(window->contentItem()).contains("Choose existing binary..."));
+      QVERIFY(visibleTexts(window->contentItem()).contains("Start light sync"));
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void retranslatesLiveWithoutWarnings()
   {
     {

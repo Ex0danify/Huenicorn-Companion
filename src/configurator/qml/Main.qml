@@ -20,7 +20,7 @@ Window {
     property int previousTab: 0
     onTabChanged: if(tab !== 3) previousTab = tab
     // Nothing to talk to and nothing to start
-    readonly property bool daemonMissing: backend.daemonPath === "" && !backend.running
+    readonly property bool daemonMissing: !backend.canStart && !backend.running
     property string toastText: ""
 
     // Lets tools and tests preselect a channel on the screen page

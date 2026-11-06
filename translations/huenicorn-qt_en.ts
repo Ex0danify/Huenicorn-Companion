@@ -106,6 +106,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Huenicorn daemon binary not found or not executable: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Daemon exited unexpectedly (code %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -199,6 +203,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Configured binary not found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Needed to build it (%1 session)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -251,7 +259,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Already installed somewhere else? Pick it in the tray menu under Settings, Choose daemon binary.</source>
+        <source>Already installed somewhere else?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose existing binary...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -344,10 +356,6 @@
     </message>
     <message>
         <source>Lights</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -634,6 +642,10 @@
     </message>
     <message>
         <source>Stopping...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

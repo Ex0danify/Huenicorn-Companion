@@ -209,14 +209,18 @@ Item {
         PillButton {
             anchors.horizontalCenter: parent.horizontalCenter
             width: Math.min(parent.width - 2 * Theme.gutter, 300)
+            objectName: "syncButton"
+            // Nothing to start without a binary, only an external daemon can show up
+            readonly property bool reconnectOnly: !backend.running && !backend.busy && !backend.canStart
             enabled: !backend.busy
             text: backend.running ? qsTr("Stop light sync")
                 : backend.daemonState === "starting" ? qsTr("Starting...")
                 : backend.daemonState === "stopping" ? qsTr("Stopping...")
+                : reconnectOnly ? qsTr("Reconnect")
                 : qsTr("Start light sync")
-            fill: backend.running ? Theme.danger : Theme.success
-            textColor: backend.running ? "#2a0808" : "#10200a"
-            onClicked: backend.toggleDaemon()
+            fill: backend.running ? Theme.danger : (reconnectOnly ? Theme.surfaceHover : Theme.success)
+            textColor: backend.running ? "#2a0808" : (reconnectOnly ? Theme.text : "#10200a")
+            onClicked: reconnectOnly ? backend.reconnect() : backend.toggleDaemon()
         }
     }
 }

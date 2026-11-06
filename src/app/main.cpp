@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
   QObject::connect(&localization, &Localization::changed, &tray, &TrayApp::retranslate);
   ConfiguratorWindow configurator(controller, updater, installer, localization);
   QObject::connect(&tray, &TrayApp::configuratorRequested, &configurator, &ConfiguratorWindow::show);
+  QObject::connect(&configurator.model(), &ConfiguratorModel::chooseDaemonRequested, &tray, &TrayApp::chooseDaemon);
 
   tray.setPreQuitStep([&configurator](TrayApp::Continuation proceed){
     configurator.model().flushThen(std::move(proceed));

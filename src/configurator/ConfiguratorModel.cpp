@@ -35,6 +35,7 @@ ConfiguratorModel::ConfiguratorModel(DaemonController& controller, QObject* pare
 
   connect(&m_controller, &DaemonController::stateChanged, this, &ConfiguratorModel::onDaemonState);
   connect(&m_controller, &DaemonController::daemonPathChanged, this, &ConfiguratorModel::daemonPathChanged);
+  connect(&m_controller, &DaemonController::daemonPathChanged, this, &ConfiguratorModel::canStartChanged);
   connect(&m_setup, &SetupController::modeChanged, this, [this](){
     if(m_setup.ready() && running()){
       m_api.setBaseUrl(m_controller.baseUrl());
@@ -103,6 +104,7 @@ double ConfiguratorModel::smoothing() const { return m_smoothing; }
 QVariantList ConfiguratorModel::interpolations() const { return m_interpolations; }
 int ConfiguratorModel::interpolation() const { return m_interpolation; }
 QString ConfiguratorModel::daemonPath() const { return m_controller.daemonPath(); }
+bool ConfiguratorModel::canStart() const { return m_controller.canStart(); }
 int ConfiguratorModel::port() const { return m_controller.port(); }
 SetupController* ConfiguratorModel::setup() { return &m_setup; }
 
@@ -132,6 +134,7 @@ int ConfiguratorModel::activeChannelCount() const
 void ConfiguratorModel::onDaemonState()
 {
   emit daemonStateChanged();
+  emit canStartChanged();
 
   // Loading waits for the setup probe, a daemon in setup mode lacks the normal API
   if(running()){
@@ -230,6 +233,20 @@ void ConfiguratorModel::toggleDaemon()
   else if(state == State::Stopped || state == State::Error){
     m_controller.start();
   }
+}
+
+
+void ConfiguratorModel::reconnect()
+{
+  // The binary may have been restored or removed since the last state change
+  emit canStartChanged();
+  m_controller.checkNow();
+}
+
+
+void ConfiguratorModel::chooseDaemon()
+{
+  emit chooseDaemonRequested();
 }
 
 

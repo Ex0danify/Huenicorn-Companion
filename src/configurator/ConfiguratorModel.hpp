@@ -45,6 +45,7 @@ class ConfiguratorModel : public QObject
   Q_PROPERTY(int interpolation READ interpolation NOTIFY settingsChanged)
 
   Q_PROPERTY(QString daemonPath READ daemonPath NOTIFY daemonPathChanged)
+  Q_PROPERTY(bool canStart READ canStart NOTIFY canStartChanged)
   Q_PROPERTY(int port READ port NOTIFY daemonStateChanged)
 
   Q_PROPERTY(SetupController* setup READ setup CONSTANT)
@@ -79,11 +80,14 @@ public:
   int interpolation() const;
 
   QString daemonPath() const;
+  bool canStart() const;
   int port() const;
   SetupController* setup();
 
   Q_INVOKABLE void refresh();
   Q_INVOKABLE void toggleDaemon();
+  Q_INVOKABLE void reconnect();
+  Q_INVOKABLE void chooseDaemon();
   Q_INVOKABLE void selectArea(const QString& areaId);
   Q_INVOKABLE void setChannelActive(int channelId, bool active);
   Q_INVOKABLE void setChannelRect(int channelId, double x0, double y0, double x1, double y1);
@@ -103,6 +107,8 @@ public:
 signals:
   void daemonStateChanged();
   void daemonPathChanged();
+  void canStartChanged();
+  void chooseDaemonRequested();
   void loadedChanged();
   void dirtyChanged();
   void areasChanged();

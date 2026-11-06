@@ -106,6 +106,10 @@
         <translation>Das Huenicorn-Daemon-Programm wurde nicht gefunden. Lege den Pfad in den Einstellungen fest.</translation>
     </message>
     <message>
+        <source>Huenicorn daemon binary not found or not executable: %1</source>
+        <translation>Huenicorn-Daemon nicht gefunden oder nicht ausführbar: %1</translation>
+    </message>
+    <message>
         <source>Daemon exited unexpectedly (code %1)</source>
         <translation>Der Daemon wurde unerwartet beendet (Code %1)</translation>
     </message>
@@ -199,6 +203,10 @@
         <translation>Der Huenicorn-Daemon übernimmt die eigentliche Licht-Synchronisation. Diese App kann Version %1 aus dem Quellcode bauen und für deinen Benutzer installieren.</translation>
     </message>
     <message>
+        <source>Configured binary not found: %1</source>
+        <translation>Konfiguriertes Programm nicht gefunden: %1</translation>
+    </message>
+    <message>
         <source>Needed to build it (%1 session)</source>
         <translation>Zum Bauen benötigt (%1-Sitzung)</translation>
     </message>
@@ -251,8 +259,12 @@
         <translation>Installiert nach %1.</translation>
     </message>
     <message>
-        <source>Already installed somewhere else? Pick it in the tray menu under Settings, Choose daemon binary.</source>
-        <translation>Schon anderswo installiert? Wähle es im Tray-Menü unter Einstellungen, Daemon-Programm auswählen.</translation>
+        <source>Already installed somewhere else?</source>
+        <translation>Schon anderswo installiert?</translation>
+    </message>
+    <message>
+        <source>Choose existing binary...</source>
+        <translation>Vorhandenes Programm auswählen...</translation>
     </message>
 </context>
 <context>
@@ -345,10 +357,6 @@
     <message>
         <source>Lights</source>
         <translation>Lichter</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -635,6 +643,10 @@
     <message>
         <source>Stopping...</source>
         <translation>Wird beendet...</translation>
+    </message>
+    <message>
+        <source>Reconnect</source>
+        <translation>Neu verbinden</translation>
     </message>
     <message>
         <source>Start light sync</source>
