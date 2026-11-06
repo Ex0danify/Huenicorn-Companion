@@ -37,6 +37,9 @@ public:
   // False when the configured binary is unset, gone or not executable
   bool canStart() const;
 
+  // A running daemon keeps its binary, so the path only changes while stopped
+  bool canChangeBinary() const;
+
   int port() const;
   void setPort(int port);
 

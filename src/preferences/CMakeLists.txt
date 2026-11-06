@@ -1,0 +1,2 @@
+add_library(huenicorn_preferences STATIC AppPreferences.cpp)
+target_link_libraries(huenicorn_preferences PUBLIC Qt6::Core huenicorn_settings)

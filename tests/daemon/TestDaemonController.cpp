@@ -105,6 +105,30 @@ private slots:
     QVERIFY(controller.canStart());
   }
 
+  void binaryOnlyChangesWhileStopped()
+  {
+    FakeDaemonApi api;
+    DaemonController controller;
+    QVERIFY(controller.canChangeBinary());
+
+    controller.setPort(api.port());
+    controller.setPollIntervalMs(100);
+    controller.beginMonitoring();
+    QVERIFY(waitForState(controller, DaemonController::State::Running));
+    QVERIFY(!controller.canChangeBinary());
+
+    controller.stop();
+    QVERIFY(!controller.canChangeBinary());
+    api.close();
+    QVERIFY(waitForState(controller, DaemonController::State::Stopped));
+    QVERIFY(controller.canChangeBinary());
+
+    DaemonController failing;
+    failing.start();
+    QCOMPARE(failing.state(), DaemonController::State::Error);
+    QVERIFY(failing.canChangeBinary());
+  }
+
   void checkNowAdoptsExternalDaemonWithoutWaiting()
   {
     FakeDaemonApi api;

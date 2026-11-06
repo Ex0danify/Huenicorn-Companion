@@ -126,6 +126,12 @@ bool DaemonController::canStart() const
 }
 
 
+bool DaemonController::canChangeBinary() const
+{
+  return m_state == State::Stopped || m_state == State::Error;
+}
+
+
 void DaemonController::checkNow()
 {
   poll();
