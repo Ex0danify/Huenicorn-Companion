@@ -43,6 +43,23 @@ Flickable {
             spacing: 24
             readonly property bool ready: backend.loaded
 
+            Card {
+                objectName: "daemonSettingsHint"
+                width: parent.width
+                height: hintText.implicitHeight + 28
+                raised: true
+                visible: !daemonSettings.ready
+
+                Text {
+                    id: hintText
+                    anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 18 }
+                    text: qsTr("Available while light sync is running.")
+                    color: Theme.text
+                    font.pixelSize: Theme.fontBody
+                    wrapMode: Text.WordWrap
+                }
+            }
+
             Column {
                 width: parent.width
                 spacing: 12
@@ -55,16 +72,6 @@ Flickable {
                     font.pixelSize: Theme.fontSmall + 1
                     wrapMode: Text.WordWrap
                 }
-                Text {
-                    objectName: "daemonSettingsHint"
-                    width: parent.width
-                    visible: !daemonSettings.ready
-                    text: qsTr("Available while light sync is running.")
-                    color: Theme.textDim
-                    font.pixelSize: Theme.fontSmall + 1
-                    wrapMode: Text.WordWrap
-                }
-
                 Flow {
                     width: parent.width
                     spacing: 8
@@ -74,7 +81,8 @@ Flickable {
                         delegate: Rectangle {
                             width: 92; height: 38; radius: 19
                             color: Theme.surfaceRaised
-                            opacity: 0.4
+                            opacity: 0.5
+                            Text { anchors.centerIn: parent; text: "—"; color: Theme.textDim; font.pixelSize: Theme.fontSmall + 1 }
                         }
                     }
 
@@ -116,13 +124,23 @@ Flickable {
 
                 Text { text: qsTr("Interpolation"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
 
-                Rectangle {
+                Row {
+                    id: segmentSkeleton
                     width: parent.width
-                    height: 52
-                    radius: Theme.radiusTile
-                    color: Theme.surfaceRaised
-                    opacity: 0.4
+                    spacing: 8
                     visible: !daemonSettings.ready
+                    opacity: 0.5
+
+                    Repeater {
+                        model: 3
+                        delegate: Rectangle {
+                            width: (segmentSkeleton.width - 2 * segmentSkeleton.spacing) / 3
+                            height: 52
+                            radius: Theme.radiusTile
+                            color: Theme.surfaceRaised
+                            Text { anchors.centerIn: parent; text: "—"; color: Theme.textDim; font.pixelSize: Theme.fontBody }
+                        }
+                    }
                 }
 
                 Segmented {
@@ -167,8 +185,12 @@ Flickable {
                         width: parent.width
                         height: 14
                         radius: 7
-                        color: Theme.surfaceRaised
-                        opacity: 0.4
+                        opacity: 0.35
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0; color: Theme.accentDeep }
+                            GradientStop { position: 1; color: "#e8f1fa" }
+                        }
                     }
                 }
 
