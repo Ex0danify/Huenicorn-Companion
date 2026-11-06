@@ -136,6 +136,7 @@ private slots:
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
       window->show();
+      QVERIFY(QTest::qWaitForWindowExposed(window));
       controller.beginMonitoring();
       QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
 
@@ -252,6 +253,7 @@ private slots:
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
       window->show();
+      QVERIFY(QTest::qWaitForWindowExposed(window));
       QTest::qWait(100);
 
       QVERIFY(!configurator.model().canStart());
@@ -260,6 +262,7 @@ private slots:
 
       auto* chooser = window->findChild<QQuickItem*>("chooseBinaryButton");
       QVERIFY(chooser != nullptr);
+      QTRY_VERIFY(chooser->isVisible() && chooser->width() > 0 && chooser->height() > 0);
       QSignalSpy spy(&configurator.model(), &ConfiguratorModel::chooseDaemonRequested);
       const QPointF p = chooser->mapToScene(QPointF(chooser->width() / 2, chooser->height() / 2));
       QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, p.toPoint());
@@ -517,6 +520,7 @@ private slots:
       QVERIFY(window != nullptr);
       window->setProperty("tab", 3);
       window->show();
+      QVERIFY(QTest::qWaitForWindowExposed(window));
       controller.beginMonitoring();
       QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
 
