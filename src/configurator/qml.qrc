@@ -4,6 +4,7 @@
     <file>qml/theme/qmldir</file>
     <file>qml/theme/Theme.qml</file>
     <file>qml/components/Card.qml</file>
+    <file>qml/components/Dropdown.qml</file>
     <file>qml/components/HueSlider.qml</file>
     <file>qml/components/Icon.qml</file>
     <file>qml/components/PillButton.qml</file>

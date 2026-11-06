@@ -94,7 +94,7 @@ the development files of libcurl, OpenCV, Mbed TLS 3 or newer, plus X11 or PipeW
 
 ## Translations
 
-English and German ship with the app. The language follows your system.
+English and German ship with the app. The language follows your system, or you can pick one under Settings, Language. The change applies right away.
 
 Each language is one file in `translations/`, named `huenicorn-qt_<code>.ts`. To add a language:
 

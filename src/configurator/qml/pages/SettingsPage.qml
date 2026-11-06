@@ -17,6 +17,25 @@ Flickable {
 
         Text { text: qsTr("Settings"); color: Theme.text; font.pixelSize: Theme.fontTitle; font.bold: true }
 
+        Column {
+            width: parent.width
+            spacing: 12
+            // The open list has to paint over the sections below
+            z: languageDropdown.open ? 10 : 0
+
+            Text { text: qsTr("Language"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
+
+            Dropdown {
+                id: languageDropdown
+                objectName: "languageDropdown"
+                width: parent.width
+                model: [{ label: qsTr("System"), value: "auto", icon: "globe" }].concat(
+                    localization.languages.map(function (l) { return { label: l.name, value: l.code, flag: l.flag } }))
+                current: localization.language
+                onPicked: (value) => localization.language = value
+            }
+        }
+
         EmptyState {
             width: parent.width
             visible: !backend.loaded

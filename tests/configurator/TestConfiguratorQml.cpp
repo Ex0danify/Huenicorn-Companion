@@ -1,6 +1,7 @@
 #include <QtTest>
 
 #include <QQuickItem>
+#include <QQuickView>
 #include <QQuickWindow>
 
 #include "FakeDaemonApi.hpp"
@@ -106,6 +107,111 @@ private slots:
       QVERIFY(visibleTexts(window->contentItem()).contains("Settings"));
       window->hide();
     }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void languageDropdownOpensAndPicks()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      localization.setLanguage("en");
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->setProperty("tab", 3);
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      auto* dropdown = window->findChild<QQuickItem*>("languageDropdown");
+      QVERIFY(dropdown != nullptr);
+      QCOMPARE(dropdown->property("open").toBool(), false);
+
+      // A click on the header opens the list below it
+      const auto center = dropdown->mapToScene(QPointF(dropdown->width() / 2, dropdown->implicitHeight() / 2)).toPoint();
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, center);
+      QTRY_COMPARE(dropdown->property("open").toBool(), true);
+      QVERIFY(!window->grabWindow().isNull());
+
+      // Entries are System, Deutsch and English; only System has no flag
+      const auto model = dropdown->property("model").toList();
+      QVERIFY(model.size() >= 3);
+      QVERIFY(model.at(0).toMap().value("flag").toString().isEmpty());
+      QVERIFY(!model.at(1).toMap().value("flag").toString().isEmpty());
+
+      // Picking German switches the app and closes the list
+      const auto list = dropdown->mapToScene(QPointF(dropdown->width() / 2, dropdown->implicitHeight() + 6 + 6 + 46 * 1 + 23)).toPoint();
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, list);
+      QTRY_COMPARE(localization.active(), QString("de"));
+      QCOMPARE(dropdown->property("open").toBool(), false);
+      QCOMPARE(settings.language(), QString("de"));
+
+      // Clicking elsewhere closes an open list without changing anything
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, center);
+      QTRY_COMPARE(dropdown->property("open").toBool(), true);
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, QPoint(window->width() - 8, center.y() + 300));
+      QTRY_COMPARE(dropdown->property("open").toBool(), false);
+      QCOMPARE(localization.active(), QString("de"));
+
+      localization.setLanguage("en");
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void dropdownShowsFourRowsAndScrollsTheRest()
+  {
+    Q_INIT_RESOURCE(qml);
+    QQuickView view(QUrl("qrc:/configurator/qml/components/Dropdown.qml"));
+    QVERIFY(view.status() == QQuickView::Ready);
+    view.show();
+    auto* dropdown = view.rootObject();
+    QVERIFY(dropdown != nullptr);
+
+    auto entries = [](int count){
+      QVariantList list;
+      for(int i = 0; i < count; i++){
+        list.append(QVariantMap{{"label", QString("Language %1").arg(i)}, {"value", i}});
+      }
+      return list;
+    };
+
+    dropdown->setProperty("model", entries(8));
+    dropdown->setProperty("current", 7);
+    QCOMPARE(dropdown->property("visibleRows").toInt(), 4);
+
+    dropdown->setProperty("open", true);
+    auto* flick = dropdown->findChild<QQuickItem*>("dropdownFlick");
+    QVERIFY(flick != nullptr);
+    const auto rowHeight = dropdown->property("rowHeight").toReal();
+    QCOMPARE(flick->height(), 4 * rowHeight);
+    QTRY_COMPARE(flick->property("contentHeight").toReal(), 8 * rowHeight);
+
+    // The current entry is last, so it is scrolled into view when opening
+    dropdown->setProperty("open", false);
+    dropdown->setProperty("open", true);
+    QCOMPARE(flick->property("contentY").toReal(), 4 * rowHeight);
+
+    // A short list shows everything and has nothing to scroll
+    dropdown->setProperty("open", false);
+    dropdown->setProperty("model", entries(3));
+    dropdown->setProperty("current", 0);
+    QCOMPARE(dropdown->property("visibleRows").toInt(), 3);
+    dropdown->setProperty("open", true);
+    QCOMPARE(flick->height(), 3 * rowHeight);
+    QTRY_COMPARE(flick->property("contentHeight").toReal(), 3 * rowHeight);
+    QCOMPARE(flick->property("contentY").toReal(), 0.0);
 
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
