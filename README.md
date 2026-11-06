@@ -36,7 +36,7 @@ running. The web page keeps working alongside it.
 ## Requirements
 
 - Linux with a system tray (KDE Plasma, or GNOME with an AppIndicator extension)
-- [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn) installed and set up with your Hue bridge
+- [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn), or the build tools to let the app build it (see below)
 - Qt 6 (Widgets, Network, Quick), CMake 3.16 or newer and a C++20 compiler to build
 
 Install the build requirements for your distribution:
@@ -73,6 +73,17 @@ build/huenicorn-qt
 
 The daemon's REST port is read from `~/.config/huenicorn/config.json`. The app finds the `huenicorn` binary through its
 settings, next to its own binary, or on your `PATH`.
+
+### Installing the daemon from the app
+
+If no daemon is found, the app offers to build Huenicorn from source. It never installs packages or asks for
+administrator rights. If something is missing, it lists it with the install command for your distribution, which you
+run yourself, then check again.
+
+The build is pinned to one daemon version. The app checks that the downloaded source is the exact expected commit and
+verifies the checksum of the three small libraries the daemon would otherwise fetch unchecked. It builds in a
+temporary directory and installs to `~/.local/bin/huenicorn`. Needs git, cmake, a C++ compiler, tar, xz, pkg-config and
+the development files of libcurl, OpenCV, Mbed TLS 3 or newer, plus X11 or PipeWire and GLib depending on your session.
 
 ## Using it
 
