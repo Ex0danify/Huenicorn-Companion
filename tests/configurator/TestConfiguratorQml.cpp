@@ -159,6 +159,82 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void savedLabelFadesOutAfterSaving()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      auto* status = window->findChild<QQuickItem*>("saveStatus");
+      QVERIFY(status != nullptr);
+      QVERIFY(!status->isVisible());
+
+      // Nothing is shown while the save is pending
+      configurator.model().setInterpolation(1);
+      QTest::qWait(100);
+      QVERIFY(!status->isVisible());
+
+      QTRY_VERIFY_WITH_TIMEOUT(status->isVisible(), 3000);
+      QCOMPARE(status->property("text").toString(), QString("Saved"));
+      QCOMPARE(status->property("color").value<QColor>(), QColor("#79c800"));
+      QTRY_VERIFY_WITH_TIMEOUT(!status->isVisible(), 6000);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void failedSaveShowsRedLabelThatStays()
+  {
+    {
+      FakeDaemonApi api;
+      api.failSaves = true;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      auto* status = window->findChild<QQuickItem*>("saveStatus");
+      QVERIFY(status != nullptr);
+
+      configurator.model().setInterpolation(1);
+      QTRY_VERIFY_WITH_TIMEOUT(status->isVisible(), 3000);
+      QCOMPARE(status->property("text").toString(), QString("Could not save profile"));
+      QCOMPARE(status->property("color").value<QColor>(), QColor("#ff6161"));
+
+      QTest::qWait(3500);
+      QVERIFY(status->isVisible());
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void missingBinaryShowsInstallPageAndChooser()
   {
     {

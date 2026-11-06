@@ -343,14 +343,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Saving…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation type="unfinished"></translation>
     </message>

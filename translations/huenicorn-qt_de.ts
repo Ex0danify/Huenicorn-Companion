@@ -343,14 +343,6 @@
         <translation>mit Daemon</translation>
     </message>
     <message>
-        <source>Saving…</source>
-        <translation>Wird gespeichert…</translation>
-    </message>
-    <message>
-        <source>Not saved</source>
-        <translation>Nicht gespeichert</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Gespeichert</translation>
     </message>

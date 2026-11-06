@@ -44,7 +44,11 @@ Window {
 
     Connections {
         target: backend
-        function onSaved(ok) { if(!ok) window.toast(qsTr("Could not save profile")) }
+        function onSaved(ok) {
+            saveStatus.failed = !ok
+            saveStatus.confirmed = ok
+            if(ok) confirmTimer.restart()
+        }
         function onRequestFailed(message) { window.toast(message) }
         // Screen and Lights are disabled without a daemon
         function onDaemonStateChanged() { if(!backend.running && (window.tab === 1 || window.tab === 2)) window.tab = 0 }
@@ -120,10 +124,18 @@ Window {
         }
 
         Text {
+            id: saveStatus
+            objectName: "saveStatus"
+            // Saved fades out, a failure stays until the next save goes through
+            property bool confirmed: false
+            property bool failed: false
             anchors { right: settingsButton.visible ? settingsButton.left : parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }
-            visible: backend.running && !backend.setup.active
-            text: backend.saving ? qsTr("Saving…") : (backend.dirty ? qsTr("Not saved") : qsTr("Saved"))
-            color: Theme.textDim
+            opacity: confirmed || failed ? 1 : 0
+            visible: backend.running && !backend.setup.active && opacity > 0
+            Behavior on opacity { NumberAnimation { duration: 400 } }
+            Timer { id: confirmTimer; interval: 3000; onTriggered: saveStatus.confirmed = false }
+            text: failed ? qsTr("Could not save profile") : qsTr("Saved")
+            color: failed ? Theme.danger : Theme.success
             font.pixelSize: Theme.fontBody
         }
     }
