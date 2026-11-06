@@ -669,7 +669,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop light sync</source>
+        <source>Stop Sync</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -685,7 +685,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start light sync</source>
+        <source>Start Sync</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -194,7 +194,7 @@ private slots:
       QTest::qWait(100);
       QVERIFY(configurator.model().canStart());
       QVERIFY(!visibleTexts(window->contentItem()).contains("Choose existing binary..."));
-      QVERIFY(visibleTexts(window->contentItem()).contains("Start light sync"));
+      QVERIFY(visibleTexts(window->contentItem()).contains("Start Sync"));
       window->hide();
     }
 

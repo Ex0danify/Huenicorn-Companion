@@ -669,8 +669,8 @@
         <translation>%1 Hz</translation>
     </message>
     <message>
-        <source>Stop light sync</source>
-        <translation>Licht-Sync stoppen</translation>
+        <source>Stop Sync</source>
+        <translation>Sync stoppen</translation>
     </message>
     <message>
         <source>Starting...</source>
@@ -685,8 +685,8 @@
         <translation>Neu verbinden</translation>
     </message>
     <message>
-        <source>Start light sync</source>
-        <translation>Licht-Sync starten</translation>
+        <source>Start Sync</source>
+        <translation>Sync starten</translation>
     </message>
 </context>
 <context>
