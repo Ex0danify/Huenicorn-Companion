@@ -455,6 +455,10 @@ void ConfiguratorModel::setChannelGamma(int channelId, double gamma)
 
 void ConfiguratorModel::setSubsampleWidth(int width)
 {
+  if(width == m_subsampleWidth){
+    return;
+  }
+
   m_api.put("/api/setSubsampleWidth", width, [this](bool ok, const QJsonDocument& doc){
     if(!ok){
       fail(tr("Could not set resolution"));
@@ -470,6 +474,9 @@ void ConfiguratorModel::setSubsampleWidth(int width)
 void ConfiguratorModel::setRefreshRate(int rate)
 {
   rate = qBound(1, rate, m_maxRefreshRate);
+  if(rate == m_refreshRate){
+    return;
+  }
   m_refreshRate = rate;
   emit settingsChanged();
 
@@ -487,6 +494,9 @@ void ConfiguratorModel::setRefreshRate(int rate)
 
 void ConfiguratorModel::setInterpolation(int interpolation)
 {
+  if(interpolation == m_interpolation){
+    return;
+  }
   m_interpolation = interpolation;
   emit settingsChanged();
 
@@ -504,6 +514,9 @@ void ConfiguratorModel::setInterpolation(int interpolation)
 void ConfiguratorModel::setSmoothing(double percent)
 {
   percent = qBound(0.0, percent, 95.0);
+  if(qFuzzyCompare(percent + 1, m_smoothing + 1)){
+    return;
+  }
   m_smoothing = percent;
   emit settingsChanged();
 

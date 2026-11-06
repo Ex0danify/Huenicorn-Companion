@@ -185,6 +185,22 @@ private slots:
     QVERIFY(!f.model->saving());
   }
 
+  void selectingTheCurrentValueDoesNothing()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+
+    f.model->setSubsampleWidth(f.model->subsampleWidth());
+    f.model->setInterpolation(f.model->interpolation());
+    f.model->setRefreshRate(f.model->refreshRate());
+    f.model->setSmoothing(f.model->smoothing());
+
+    QTest::qWait(800);
+    QVERIFY(!f.model->dirty());
+    QCOMPARE(f.api.count("PUT", "/api/set"), 0);
+    QCOMPARE(f.api.count("POST", "/api/saveProfile"), 0);
+  }
+
   void rapidChangesCollapseIntoOneSave()
   {
     Fixture f;
