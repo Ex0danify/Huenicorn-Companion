@@ -10,7 +10,7 @@ Item {
     property real stepSize: 0
     property real trackHeight: 14
     property real knobSize: 30
-    // Bubble above the knob while dragging, left out when empty
+    // Bubble above the knob while hovering or dragging, left out when empty
     property string popupText: ""
     // Above zero the track becomes a bar with square top corners and bottom corners of this
     // radius, meant to sit flush along the bottom of a rounded card
@@ -21,6 +21,8 @@ Item {
     // Value shown while dragging, so labels can follow the handle
     readonly property real displayValue: dragging ? _drag : value
     property bool dragging: false
+    // Hover shows the bubble only after a short rest, so passing over a slider stays quiet
+    property bool _hovered: false
     property real _drag: value
 
     // Live feedback while dragging, committed once on release
@@ -64,11 +66,17 @@ Item {
         Behavior on scale { NumberAnimation { duration: 90 } }
     }
 
+    Timer {
+        interval: 350
+        running: area.containsMouse
+        onTriggered: root._hovered = true
+    }
+
     Rectangle {
         id: bubble
         objectName: "valueBubble"
         visible: opacity > 0
-        opacity: root.dragging && root.popupText !== "" ? 1 : 0
+        opacity: (root.dragging || root._hovered) && root.popupText !== "" ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 120 } }
 
         width: bubbleText.implicitWidth + 24
@@ -93,6 +101,8 @@ Item {
     MouseArea {
         id: area
         anchors.fill: parent
+        hoverEnabled: true
+        onContainsMouseChanged: if(!containsMouse) root._hovered = false
         cursorShape: Qt.PointingHandCursor
 
         function update(mx) {

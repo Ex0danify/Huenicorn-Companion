@@ -160,7 +160,7 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
-  void gammaBubbleShowsWhileDragging()
+  void gammaBubbleShowsOnHoverAndWhileDragging()
   {
     {
       FakeDaemonApi api;
@@ -192,6 +192,13 @@ private slots:
       QCOMPARE(bubbleOpacity(), 0.0);
 
       const auto target = slider()->mapToScene(QPointF(slider()->width() * 0.75, slider()->height() / 2)).toPoint();
+      QTest::mouseMove(window, target);
+      QCOMPARE(bubbleOpacity(), 0.0);
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 1.0, 2000);
+      QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor"), 0);
+      QTest::mouseMove(window, QPoint(5, 5));
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 0.0, 2000);
+
       QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, target);
       QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 1.0, 2000);
       QVERIFY(slider()->property("popupText").toString().startsWith("Gamma +"));
