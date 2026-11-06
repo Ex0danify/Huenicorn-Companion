@@ -107,12 +107,22 @@ Item {
         }
     }
 
-    // Catches clicks anywhere else so the list closes like a normal dropdown
+    // Lives on the window so clicks anywhere outside close the list, margins and other pages included
     MouseArea {
+        parent: root.Window.contentItem
+        anchors.fill: parent
+        z: 1000
         visible: root.open
-        x: -4000; y: -4000
-        width: 8000; height: 8000
-        onClicked: root.open = false
+        onPressed: (mouse) => {
+            const p = mapToItem(root, mouse.x, mouse.y)
+            const inHeader = p.x >= 0 && p.x <= root.width && p.y >= 0 && p.y <= header.height
+            const inList = p.x >= 0 && p.x <= list.width && p.y >= list.y && p.y <= list.y + list.height
+            if (inHeader || inList) {
+                mouse.accepted = false
+                return
+            }
+            root.open = false
+        }
     }
 
     Rectangle {
