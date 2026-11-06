@@ -10,6 +10,8 @@ Item {
     property real stepSize: 0
     property real trackHeight: 14
     property real knobSize: 30
+    // Bubble above the knob while dragging, left out when empty
+    property string popupText: ""
     // Above zero the track becomes a bar with square top corners and bottom corners of this
     // radius, meant to sit flush along the bottom of a rounded card
     property real barRadius: 0
@@ -60,6 +62,32 @@ Item {
         color: "white"
         scale: area.pressed ? 1.1 : 1
         Behavior on scale { NumberAnimation { duration: 90 } }
+    }
+
+    Rectangle {
+        id: bubble
+        objectName: "valueBubble"
+        visible: opacity > 0
+        opacity: root.dragging && root.popupText !== "" ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 120 } }
+
+        width: bubbleText.implicitWidth + 24
+        height: bubbleText.implicitHeight + 12
+        radius: height / 2
+        y: -height - 8
+        x: Math.max(0, Math.min(root.width - width, knob.x + knob.width / 2 - width / 2))
+        color: Theme.surfaceRaised
+        border.width: 1
+        border.color: Theme.border
+
+        Text {
+            id: bubbleText
+            anchors.centerIn: parent
+            text: root.popupText
+            color: Theme.text
+            font.pixelSize: Theme.fontSmall + 1
+            font.bold: true
+        }
     }
 
     MouseArea {

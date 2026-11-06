@@ -5,6 +5,10 @@ import "../components"
 Flickable {
     id: page
 
+    function gammaText(v) {
+        return qsTr("Gamma %1").arg((v > 0 ? "+" : "") + v.toLocaleString(Qt.locale(), "f", 1))
+    }
+
     contentHeight: column.height + 8
     clip: true
     boundsBehavior: Flickable.StopAtBounds
@@ -93,6 +97,7 @@ Flickable {
                     to: 1
                     stepSize: 0.1
                     value: card.modelData.gamma
+                    popupText: page.gammaText(displayValue)
                     onCommitted: (v) => backend.setChannelGamma(card.modelData.channelId, v)
                 }
             }

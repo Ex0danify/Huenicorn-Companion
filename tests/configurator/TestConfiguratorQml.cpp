@@ -160,6 +160,52 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void gammaBubbleShowsWhileDragging()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+      window->setProperty("tab", 2);
+
+      // Channel updates rebuild the delegates, so items are looked up again each time
+      auto slider = [window](){ return itemByName(window->contentItem(), "gammaSlider"); };
+      auto bubbleOpacity = [&slider](){
+        auto* bubble = slider() ? itemByName(slider(), "valueBubble") : nullptr;
+        return bubble ? bubble->property("opacity").toDouble() : -1.0;
+      };
+      QTRY_VERIFY_WITH_TIMEOUT(slider() != nullptr, 3000);
+      QTest::qWait(200);
+      QCOMPARE(bubbleOpacity(), 0.0);
+
+      const auto target = slider()->mapToScene(QPointF(slider()->width() * 0.75, slider()->height() / 2)).toPoint();
+      QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, target);
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 1.0, 2000);
+      QVERIFY(slider()->property("popupText").toString().startsWith("Gamma +"));
+      QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor"), 0);
+
+      QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, target);
+      QTRY_COMPARE_WITH_TIMEOUT(api.count("PUT", "/api/setChannelGammaFactor/0"), 1, 3000);
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 0.0, 2000);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void savedLabelFadesOutAfterSaving()
   {
     {

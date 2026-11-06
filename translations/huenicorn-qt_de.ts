@@ -293,6 +293,10 @@
 <context>
     <name>LightsPage</name>
     <message>
+        <source>Gamma %1</source>
+        <translation>Gamma %1</translation>
+    </message>
+    <message>
         <source>Lights</source>
         <translation>Lichter</translation>
     </message>
