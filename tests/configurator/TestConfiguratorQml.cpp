@@ -245,6 +245,14 @@ private slots:
       controller.setDaemonPath("/nonexistent/huenicorn");
       UpdateController updater("0.1.0");
       DaemonInstaller installer(PinnedDaemon::current());
+      // Unmet requirements make the page taller than the window, which depends on the host
+      HostProbe probe;
+      probe.hasTool = [](const QString&){ return true; };
+      probe.hasModules = [](const QStringList&){ return true; };
+      probe.mbedtlsMajor = [](){ return 3; };
+      installer.setProbe(probe);
+      installer.setSession(SessionType::Wayland);
+      installer.setSystem({PackageKind::Rpm, {"fedora"}});
       Settings settings;
       Localization localization(settings);
       AppPreferences preferences(settings);
