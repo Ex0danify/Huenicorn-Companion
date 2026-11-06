@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="resources/logo.svg" alt="Huenicorn GUI logo" width="120">
+<img src="resources/logo.svg" alt="Huenicorn Companion logo" width="120">
 
-# Huenicorn GUI
+# Huenicorn Companion
 
 **A native Qt tray app and configurator for [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn), the Philips Hue screen sync for Linux.**
 
@@ -29,7 +29,7 @@
 screen and streams the colors to your Hue lights in real time, so the room glows along with your games, movies and
 desktop. It runs as a background daemon and is configured through a web page.
 
-Huenicorn GUI is a more beautiful way to configure it. This native desktop app sits in your system tray, starts the
+Huenicorn Companion is a more beautiful way to configure it. This native desktop app sits in your system tray, starts the
 daemon for you and opens a clean window where you pick your lights, tune the effect and see at a glance whether sync is
 running. The web page keeps working alongside it.
 
@@ -68,7 +68,7 @@ sudo pacman -S --needed base-devel cmake qt6-base qt6-declarative qt6-tools
 cmake -S . -B build
 cmake --build build
 ctest --test-dir build
-build/huenicorn-qt
+build/huenicorn-companion
 ```
 
 The daemon's REST port is read from `~/.config/huenicorn/config.json`. The app finds the `huenicorn` binary through its
@@ -96,14 +96,14 @@ the development files of libcurl, OpenCV, Mbed TLS 3 or newer, plus X11 or PipeW
 
 English and German ship with the app. The language follows your system, or you can pick one under Settings, Language. The change applies right away.
 
-Each language is one file in `translations/`, named `huenicorn-qt_<code>.ts`. To add a language:
+Each language is one file in `translations/`, named `huenicorn-companion_<code>.ts`. To add a language:
 
 ```sh
-cp translations/huenicorn-qt_en.ts translations/huenicorn-qt_fr.ts
+cp translations/huenicorn-companion_en.ts translations/huenicorn-companion_fr.ts
 # change language="en" to language="fr" in the new file, then
 cmake -S . -B build
 cmake --build build --target update_translations
-linguist-qt6 translations/huenicorn-qt_fr.ts
+linguist-qt6 translations/huenicorn-companion_fr.ts
 ```
 
 Reconfigure once so the build picks up the new file, then translate it in Qt Linguist or any text editor. Untranslated strings
@@ -112,18 +112,18 @@ changing any user visible text in the code. Strings in the `.ts` files are group
 
 ## Credits
 
-Huenicorn GUI is a companion to [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn) by
+This app is a companion to [Huenicorn](https://gitlab.com/openjowelsofts/huenicorn) by
 [openjowelsofts](https://gitlab.com/openjowelsofts).
 
 ## Releases
 
 Versions are managed by [release-please](https://github.com/googleapis/release-please) from Conventional Commit messages on `master`. It keeps a release PR open that bumps the version in `CMakeLists.txt`. Merging it creates the `vX.Y.Z` tag and the GitHub release, and the tag builds and tests the packages and attaches them with a `SHA256SUMS` file and a build provenance attestation:
 
-    huenicorn-qt-X.Y.Z-fedora.rpm
-    huenicorn-qt-X.Y.Z-ubuntu-24.04.deb
-    huenicorn-qt-X.Y.Z-debian-13.deb
-    huenicorn-qt-X.Y.Z-arch.pkg.tar.zst
-    huenicorn-qt-X.Y.Z-linux-x86_64.tar.gz
+    huenicorn-companion-X.Y.Z-fedora.rpm
+    huenicorn-companion-X.Y.Z-ubuntu-24.04.deb
+    huenicorn-companion-X.Y.Z-debian-13.deb
+    huenicorn-companion-X.Y.Z-arch.pkg.tar.zst
+    huenicorn-companion-X.Y.Z-linux-x86_64.tar.gz
 
 Build a package locally with `cpack -G RPM` (or `DEB`, `TGZ`) in the build directory. The Arch package is built from `packaging/arch/PKGBUILD`.
 
