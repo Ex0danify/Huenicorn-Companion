@@ -48,7 +48,8 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -80,7 +81,8 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -126,7 +128,8 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -165,7 +168,8 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -195,6 +199,89 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void changeBinaryFollowsDaemonState()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->setProperty("tab", 3);
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      auto* button = window->findChild<QQuickItem*>("changeBinaryButton");
+      QVERIFY(button != nullptr);
+      QVERIFY(!button->isEnabled());
+
+      api.close();
+      QTRY_VERIFY_WITH_TIMEOUT(!configurator.model().running(), 5000);
+      QTRY_VERIFY_WITH_TIMEOUT(button->isEnabled(), 2000);
+
+      QSignalSpy spy(&configurator.model(), &ConfiguratorModel::chooseDaemonRequested);
+      QVERIFY(QMetaObject::invokeMethod(button, "clicked"));
+      QCOMPARE(spy.count(), 1);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void startupTogglesWritePreferences()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->setProperty("tab", 3);
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      auto* autostart = itemByName(window->contentItem(), "autostartDaemonToggle");
+      auto* stopOnQuit = itemByName(window->contentItem(), "stopOnQuitToggle");
+      QVERIFY(autostart != nullptr);
+      QVERIFY(stopOnQuit != nullptr);
+      QVERIFY(itemByName(window->contentItem(), "launchAtLoginToggle") != nullptr);
+
+      QCOMPARE(autostart->property("checked").toBool(), preferences.autostartDaemon());
+      const bool before = preferences.autostartDaemon();
+      QVERIFY(QMetaObject::invokeMethod(autostart, "toggled", Q_ARG(bool, !before)));
+      QCOMPARE(preferences.autostartDaemon(), !before);
+      QTRY_COMPARE_WITH_TIMEOUT(autostart->property("checked").toBool(), !before, 1000);
+      QCOMPARE(Settings().autostartDaemon(), !before);
+
+      const bool quitBefore = preferences.stopDaemonOnQuit();
+      QVERIFY(QMetaObject::invokeMethod(stopOnQuit, "toggled", Q_ARG(bool, !quitBefore)));
+      QCOMPARE(preferences.stopDaemonOnQuit(), !quitBefore);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void retranslatesLiveWithoutWarnings()
   {
     {
@@ -207,8 +294,9 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
+      AppPreferences preferences(settings);
       localization.setLanguage("en");
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -253,8 +341,9 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
+      AppPreferences preferences(settings);
       localization.setLanguage("en");
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -360,7 +449,8 @@ private slots:
       DaemonInstaller installer(PinnedDaemon::current());
       Settings settings;
       Localization localization(settings);
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -439,7 +529,8 @@ private slots:
 
       Settings settings;
       Localization localization(settings);
-      ConfiguratorWindow configurator(controller, updater, installer, localization);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
       window->show();
@@ -485,6 +576,20 @@ private slots:
 
 private:
   QTemporaryDir m_config;
+
+  // Repeater delegates are not QObject children of the page, so findChild misses them
+  static QQuickItem* itemByName(QQuickItem* item, const QString& name)
+  {
+    if(item->objectName() == name){
+      return item;
+    }
+    for(auto* child : item->childItems()){
+      if(auto* found = itemByName(child, name)){
+        return found;
+      }
+    }
+    return nullptr;
+  }
 
   static QStringList visibleTexts(QQuickItem* item)
   {

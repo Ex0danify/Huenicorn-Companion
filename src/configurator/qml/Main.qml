@@ -38,6 +38,11 @@ Window {
     }
 
     Connections {
+        target: preferences
+        function onLaunchAtLoginFailed() { window.toast(qsTr("Could not update the autostart entry")) }
+    }
+
+    Connections {
         target: backend
         function onSaved(ok) { if(!ok) window.toast(qsTr("Could not save profile")) }
         function onRequestFailed(message) { window.toast(message) }

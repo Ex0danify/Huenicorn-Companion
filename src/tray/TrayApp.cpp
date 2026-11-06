@@ -2,10 +2,8 @@
 
 #include <QApplication>
 #include <QDesktopServices>
-#include <QFileDialog>
 #include <QMessageBox>
 
-#include "settings/Autostart.hpp"
 #include "tray/IconFactory.hpp"
 
 
@@ -83,37 +81,6 @@ void TrayApp::buildMenu()
   });
   m_menu.addSeparator();
 
-  m_settingsMenu = m_menu.addMenu(QString());
-  auto* settings = m_settingsMenu;
-  m_autostartDaemonAction = settings->addAction(QString());
-  m_autostartDaemonAction->setCheckable(true);
-  m_autostartDaemonAction->setChecked(m_settings.autostartDaemon());
-  connect(m_autostartDaemonAction, &QAction::toggled, this, [this](bool on){
-    m_settings.setAutostartDaemon(on);
-  });
-
-  m_autostartLoginAction = settings->addAction(QString());
-  m_autostartLoginAction->setCheckable(true);
-  m_autostartLoginAction->setChecked(Autostart::isEnabled());
-  connect(m_autostartLoginAction, &QAction::toggled, this, [this](bool on){
-    if(!Autostart::setEnabled(on)){
-      QSignalBlocker blocker(m_autostartLoginAction);
-      m_autostartLoginAction->setChecked(!on);
-      m_tray.showMessage(tr("Huenicorn"), tr("Could not update the autostart entry"), QSystemTrayIcon::Warning);
-    }
-  });
-
-  m_stopOnQuitAction = settings->addAction(QString());
-  m_stopOnQuitAction->setCheckable(true);
-  m_stopOnQuitAction->setChecked(m_settings.stopDaemonOnQuit());
-  connect(m_stopOnQuitAction, &QAction::toggled, this, [this](bool on){
-    m_settings.setStopDaemonOnQuit(on);
-  });
-
-  settings->addSeparator();
-  m_chooseDaemonAction = settings->addAction(QString(), this, &TrayApp::chooseDaemon);
-
-  m_menu.addSeparator();
   m_quitAction = m_menu.addAction(QString(), this, &TrayApp::quit);
 
   retranslate();
@@ -128,11 +95,6 @@ void TrayApp::retranslate()
   m_openConfiguratorAction->setText(tr("Open Configurator"));
   m_webConfigAction->setText(tr("Open Web-Configurator"));
   m_logAction->setText(tr("Show log"));
-  m_settingsMenu->setTitle(tr("Settings"));
-  m_autostartDaemonAction->setText(tr("Start light sync on app start"));
-  m_autostartLoginAction->setText(tr("Launch at login"));
-  m_stopOnQuitAction->setText(tr("Stop daemon when quitting"));
-  m_chooseDaemonAction->setText(tr("Choose daemon binary..."));
   m_quitAction->setText(tr("Quit"));
   refresh();
 }
@@ -174,18 +136,6 @@ void TrayApp::openWebConfigurator() const
   if(m_controller.state() == DaemonController::State::Running){
     QDesktopServices::openUrl(m_controller.baseUrl());
   }
-}
-
-
-void TrayApp::chooseDaemon()
-{
-  const auto path = QFileDialog::getOpenFileName(nullptr, tr("Select huenicorn binary"), m_controller.daemonPath());
-  if(path.isEmpty()){
-    return;
-  }
-
-  m_settings.setDaemonPath(path);
-  m_controller.setDaemonPath(path);
 }
 
 

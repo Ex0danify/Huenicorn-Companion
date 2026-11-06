@@ -46,6 +46,7 @@ class ConfiguratorModel : public QObject
 
   Q_PROPERTY(QString daemonPath READ daemonPath NOTIFY daemonPathChanged)
   Q_PROPERTY(bool canStart READ canStart NOTIFY canStartChanged)
+  Q_PROPERTY(bool canChangeBinary READ canChangeBinary NOTIFY daemonStateChanged)
   Q_PROPERTY(int port READ port NOTIFY daemonStateChanged)
 
   Q_PROPERTY(SetupController* setup READ setup CONSTANT)
@@ -81,6 +82,7 @@ public:
 
   QString daemonPath() const;
   bool canStart() const;
+  bool canChangeBinary() const;
   int port() const;
   SetupController* setup();
 

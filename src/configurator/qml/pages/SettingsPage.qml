@@ -177,14 +177,82 @@ Flickable {
                     }
                 }
 
-                PillButton {
-                    text: qsTr("Open Web-Configurator")
-                    fill: Theme.surfaceHover
-                    textColor: Theme.text
-                    fontSize: Theme.fontBody
-                    implicitHeight: 42
-                    enabled: backend.running
-                    onClicked: backend.openWebConfigurator()
+                Flow {
+                    width: parent.width
+                    spacing: 8
+
+                    PillButton {
+                        objectName: "changeBinaryButton"
+                        text: qsTr("Change binary...")
+                        fill: Theme.surfaceHover
+                        textColor: Theme.text
+                        fontSize: Theme.fontBody
+                        implicitHeight: 42
+                        enabled: backend.canChangeBinary
+                        onClicked: backend.chooseDaemon()
+                    }
+
+                    PillButton {
+                        text: qsTr("Open Web-Configurator")
+                        fill: Theme.surfaceHover
+                        textColor: Theme.text
+                        fontSize: Theme.fontBody
+                        implicitHeight: 42
+                        enabled: backend.running
+                        onClicked: backend.openWebConfigurator()
+                    }
+                }
+
+                Text {
+                    width: parent.width
+                    visible: !backend.canChangeBinary
+                    text: qsTr("Stop light sync to change the binary. The new one is used the next time it starts.")
+                    color: Theme.textDim
+                    font.pixelSize: Theme.fontSmall + 1
+                    wrapMode: Text.WordWrap
+                }
+            }
+        }
+
+        Card {
+            width: parent.width
+            height: startup.height + 40
+
+            Column {
+                id: startup
+                x: 22; y: 20
+                width: parent.width - 44
+                spacing: 14
+
+                Text { text: qsTr("Startup"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
+
+                Repeater {
+                    model: [
+                        { objectName: "autostartDaemonToggle", label: qsTr("Start light sync on app start"), key: "autostartDaemon" },
+                        { objectName: "launchAtLoginToggle", label: qsTr("Launch at login"), key: "launchAtLogin" },
+                        { objectName: "stopOnQuitToggle", label: qsTr("Stop daemon when quitting"), key: "stopDaemonOnQuit" }
+                    ]
+                    delegate: Row {
+                        id: toggleRow
+                        required property var modelData
+                        width: startup.width
+                        spacing: 12
+
+                        Text {
+                            width: parent.width - 58 - 12
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: toggleRow.modelData.label
+                            color: Theme.text
+                            font.pixelSize: Theme.fontSmall + 1
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Toggle {
+                            objectName: toggleRow.modelData.objectName
+                            checked: preferences[toggleRow.modelData.key]
+                            onToggled: (value) => preferences[toggleRow.modelData.key] = value
+                        }
+                    }
                 }
             }
         }

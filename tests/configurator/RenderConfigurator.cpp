@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
   DaemonInstaller installer(PinnedDaemon::current());
   Settings settings;
   Localization localization(settings);
-  ConfiguratorWindow configurator(controller, updater, installer, localization);
+  AppPreferences preferences(settings);
+  ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
   auto* window = configurator.window();
   window->show();
   controller.beginMonitoring();

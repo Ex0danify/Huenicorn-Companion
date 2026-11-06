@@ -105,6 +105,7 @@ QVariantList ConfiguratorModel::interpolations() const { return m_interpolations
 int ConfiguratorModel::interpolation() const { return m_interpolation; }
 QString ConfiguratorModel::daemonPath() const { return m_controller.daemonPath(); }
 bool ConfiguratorModel::canStart() const { return m_controller.canStart(); }
+bool ConfiguratorModel::canChangeBinary() const { return m_controller.canChangeBinary(); }
 int ConfiguratorModel::port() const { return m_controller.port(); }
 SetupController* ConfiguratorModel::setup() { return &m_setup; }
 

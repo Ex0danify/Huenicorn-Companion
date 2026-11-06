@@ -31,8 +31,6 @@ public:
   using Continuation = std::function<void()>;
   void setPreQuitStep(std::function<void(Continuation)> step);
 
-  void chooseDaemon();
-
 signals:
   // The composition root decides what "configurator" means, the tray does not know
   void configuratorRequested();
@@ -51,7 +49,6 @@ private:
   QSystemTrayIcon m_tray;
   QMenu m_menu;
 
-  QMenu* m_settingsMenu{};
   QAction* m_statusAction{};
   QAction* m_startAction{};
   QAction* m_stopAction{};
@@ -59,9 +56,5 @@ private:
   QAction* m_openConfiguratorAction{};
   QAction* m_webConfigAction{};
   QAction* m_logAction{};
-  QAction* m_chooseDaemonAction{};
   QAction* m_quitAction{};
-  QAction* m_autostartLoginAction{};
-  QAction* m_autostartDaemonAction{};
-  QAction* m_stopOnQuitAction{};
 };
