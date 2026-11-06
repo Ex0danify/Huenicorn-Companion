@@ -35,7 +35,7 @@ signals:
 private:
   void buildMenu();
   void refresh();
-  void openWebConfigurator();
+  void openWebConfigurator() const;
   void chooseDaemon();
   void finishQuit();
 
