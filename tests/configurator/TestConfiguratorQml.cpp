@@ -213,6 +213,52 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void doubleClickOnGammaKnobResetsToNeutral()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+      window->setProperty("tab", 2);
+
+      auto slider = [window](){ return itemByName(window->contentItem(), "gammaSlider"); };
+      QTRY_VERIFY_WITH_TIMEOUT(slider() != nullptr, 3000);
+      QTest::qWait(200);
+
+      configurator.model().setChannelGamma(0, 0.6);
+      QTRY_COMPARE_WITH_TIMEOUT(api.channels.at(0).toObject().value("gammaFactor").toDouble(), 0.6, 3000);
+      QTest::qWait(200);
+
+      auto* knob = itemByName(slider(), "knob");
+      QVERIFY(knob != nullptr);
+      const auto onKnob = knob->mapToScene(QPointF(knob->width() / 2, knob->height() / 2)).toPoint();
+      // A plain click on the knob changes nothing, so it must not send anything
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, onKnob);
+      QTest::qWait(300);
+      QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor/0"), 1);
+
+      QTest::mouseDClick(window, Qt::LeftButton, Qt::NoModifier, onKnob);
+
+      QTRY_COMPARE_WITH_TIMEOUT(api.channels.at(0).toObject().value("gammaFactor").toDouble(), 0.0, 3000);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void savedLabelFadesOutAfterSaving()
   {
     {

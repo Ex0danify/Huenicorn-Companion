@@ -10,6 +10,8 @@ Item {
     property real stepSize: 0
     property real trackHeight: 14
     property real knobSize: 30
+    // Double-clicking the knob jumps here, unset leaves the gesture off
+    property real resetValue: NaN
     // Bubble above the knob while hovering or dragging, left out when empty
     property string popupText: ""
     // Above zero the track becomes a bar with square top corners and bottom corners of this
@@ -24,6 +26,8 @@ Item {
     // Hover shows the bubble only after a short rest, so passing over a slider stays quiet
     property bool _hovered: false
     property real _drag: value
+    property real _pressValue: 0
+    property real _grab: 0
 
     // Live feedback while dragging, committed once on release
     signal moved(real value)
@@ -58,6 +62,7 @@ Item {
 
     Rectangle {
         id: knob
+        objectName: "knob"
         width: root.knobSize; height: root.knobSize; radius: knobSize / 2
         anchors.verticalCenter: parent.verticalCenter
         x: root._edge + root.ratio * (root.width - width - 2 * root._edge)
@@ -106,7 +111,7 @@ Item {
         cursorShape: Qt.PointingHandCursor
 
         function update(mx) {
-            var r = Math.max(0, Math.min(1, (mx - root._edge - knob.width / 2) / (root.width - knob.width - 2 * root._edge)))
+            var r = Math.max(0, Math.min(1, (mx - root._grab - root._edge - knob.width / 2) / (root.width - knob.width - 2 * root._edge)))
             var v = root.from + r * (root.to - root.from)
             if (root.stepSize > 0)
                 v = Math.round(v / root.stepSize) * root.stepSize
@@ -114,8 +119,27 @@ Item {
             root.moved(v)
         }
 
-        onPressed: (m) => { root.dragging = true; update(m.x) }
+        onPressed: (m) => {
+            root._pressValue = root.value
+            // Grabbing the knob keeps it under the pointer instead of jumping to it
+            const centre = knob.x + knob.width / 2
+            root._grab = Math.abs(m.x - centre) <= knob.width / 2 ? m.x - centre : 0
+            root.dragging = true
+            update(m.x)
+        }
+        // The second press already started a drag, the release then commits the reset
+        onDoubleClicked: (m) => {
+            const onKnob = Math.abs(m.x - (knob.x + knob.width / 2)) <= knob.width / 2 + 4
+            if (onKnob && !isNaN(root.resetValue)) {
+                root._drag = root.resetValue
+                root.moved(root.resetValue)
+            }
+        }
         onPositionChanged: (m) => { if (pressed) update(m.x) }
-        onReleased: { root.dragging = false; root.committed(root._drag) }
+        onReleased: {
+            root.dragging = false
+            if (Math.abs(root._drag - root._pressValue) > 1e-9)
+                root.committed(root._drag)
+        }
     }
 }

@@ -96,6 +96,7 @@ Flickable {
                     from: -1
                     to: 1
                     stepSize: 0.1
+                    resetValue: 0
                     value: card.modelData.gamma
                     popupText: page.gammaText(displayValue)
                     onCommitted: (v) => backend.setChannelGamma(card.modelData.channelId, v)
