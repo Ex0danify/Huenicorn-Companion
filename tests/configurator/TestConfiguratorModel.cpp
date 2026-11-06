@@ -172,6 +172,41 @@ private slots:
     QCOMPARE(f.channel(0).value("gamma").toDouble(), 0.4);
   }
 
+  void globalGammaIsWrittenToEveryChannel()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+
+    f.model->setChannelGamma(0, 0.3);
+    f.model->setAllChannelsGamma(-0.6);
+    QCOMPARE(f.channel(0).value("gamma").toDouble(), -0.6);
+    QCOMPARE(f.channel(1).value("gamma").toDouble(), -0.6);
+
+    QTRY_COMPARE(f.api.count("PUT", "/api/setChannelGammaFactor/1"), 1);
+    QTRY_COMPARE(f.api.count("PUT", "/api/setChannelGammaFactor/0"), 2);
+    for(int i = 0; i < 2; i++){
+      QCOMPARE(f.api.channels.at(i).toObject().value("gammaFactor").toDouble(), -0.6);
+    }
+
+    f.model->setAllChannelsGamma(9);
+    QCOMPARE(f.channel(1).value("gamma").toDouble(), 1.0);
+  }
+
+  void globalGammaRollsBackOnlyTheChannelThatFailed()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+    QSignalSpy failed(f.model.get(), &ConfiguratorModel::requestFailed);
+
+    f.api.failPaths = {"/api/setChannelGammaFactor/1"};
+    f.model->setAllChannelsGamma(0.5);
+    QTRY_COMPARE(failed.count(), 1);
+
+    QCOMPARE(f.channel(0).value("gamma").toDouble(), 0.5);
+    QCOMPARE(f.channel(1).value("gamma").toDouble(), 0.0);
+    QCOMPARE(f.api.channels.at(1).toObject().value("gammaFactor").toDouble(), 0.0);
+  }
+
   void failedSettingsFallBackToTheDaemonState()
   {
     Fixture f;

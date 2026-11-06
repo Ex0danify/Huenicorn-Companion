@@ -97,6 +97,7 @@ public:
   Q_INVOKABLE void setChannelActive(int channelId, bool active);
   Q_INVOKABLE void setChannelRect(int channelId, double x0, double y0, double x1, double y1);
   Q_INVOKABLE void setChannelGamma(int channelId, double gamma);
+  Q_INVOKABLE void setAllChannelsGamma(double gamma);
   Q_INVOKABLE void setSubsampleWidth(int width);
   Q_INVOKABLE void setRefreshRate(int rate);
   Q_INVOKABLE void setInterpolation(int interpolation);

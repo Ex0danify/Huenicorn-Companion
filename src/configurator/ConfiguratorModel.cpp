@@ -470,6 +470,19 @@ void ConfiguratorModel::setChannelGamma(int channelId, double gamma)
 }
 
 
+// The daemon has no global gamma, so this writes every channel on its own
+void ConfiguratorModel::setAllChannelsGamma(double gamma)
+{
+  QList<int> ids;
+  for(const auto& entry : std::as_const(m_channels)){
+    ids.append(entry.toMap().value("channelId").toInt());
+  }
+  for(const int id : ids){
+    setChannelGamma(id, gamma);
+  }
+}
+
+
 void ConfiguratorModel::setSubsampleWidth(int width)
 {
   if(width == m_subsampleWidth){

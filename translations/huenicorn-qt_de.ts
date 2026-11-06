@@ -289,10 +289,6 @@
         <source>Channel %1</source>
         <translation>Kanal %1</translation>
     </message>
-    <message>
-        <source>Gamma</source>
-        <translation>Gamma</translation>
-    </message>
 </context>
 <context>
     <name>LightsPage</name>
@@ -305,8 +301,16 @@
         <translation>%1 von %2 synchronisiert</translation>
     </message>
     <message>
+        <source>Gamma for all lights</source>
+        <translation>Gamma für alle Lichter</translation>
+    </message>
+    <message>
         <source>Channel %1</source>
         <translation>Kanal %1</translation>
+    </message>
+    <message>
+        <source>Gamma</source>
+        <translation>Gamma</translation>
     </message>
 </context>
 <context>

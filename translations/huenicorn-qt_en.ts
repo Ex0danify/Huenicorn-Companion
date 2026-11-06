@@ -289,10 +289,6 @@
         <source>Channel %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Gamma</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>LightsPage</name>
@@ -305,7 +301,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Gamma for all lights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gamma</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

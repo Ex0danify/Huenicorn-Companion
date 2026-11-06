@@ -130,37 +130,6 @@ Flickable {
                         onToggled: (on) => backend.setChannelActive(page.selected.channelId, on)
                     }
                 }
-
-                Column {
-                    width: parent.width
-                    spacing: 8
-
-                    Row {
-                        width: parent.width
-                        Text {
-                            width: parent.width - gammaValue.width
-                            text: qsTr("Gamma")
-                            color: Theme.text
-                            font.pixelSize: Theme.fontBody
-                        }
-                        Text {
-                            id: gammaValue
-                            text: (gamma.displayValue > 0 ? "+" : "") + gamma.displayValue.toLocaleString(Qt.locale(), "f", 1)
-                            color: Theme.textDim
-                            font.pixelSize: Theme.fontBody
-                        }
-                    }
-
-                    HueSlider {
-                        id: gamma
-                        width: parent.width
-                        from: -1
-                        to: 1
-                        stepSize: 0.1
-                        value: page.selected ? page.selected.gamma : 0
-                        onCommitted: (v) => backend.setChannelGamma(page.selected.channelId, v)
-                    }
-                }
             }
         }
     }
