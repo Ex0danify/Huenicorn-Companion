@@ -17,6 +17,8 @@ Window {
     onVisibleChanged: if(!visible) backend.flush()
 
     property int tab: 0
+    property int previousTab: 0
+    onTabChanged: if(tab !== 3) previousTab = tab
     // Nothing to talk to and nothing to start
     readonly property bool daemonMissing: backend.daemonPath === "" && !backend.running
     property string toastText: ""
@@ -102,8 +104,18 @@ Window {
             }
         }
 
-        Text {
+        IconButton {
+            id: settingsButton
+            objectName: "settingsButton"
             anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+            visible: !backend.setup.active && !window.daemonMissing
+            icon: "cog"
+            active: window.tab === 3
+            onClicked: window.tab = window.tab === 3 ? window.previousTab : 3
+        }
+
+        Text {
+            anchors { right: settingsButton.visible ? settingsButton.left : parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }
             visible: backend.running && !backend.setup.active
             text: backend.saving ? qsTr("Saving…") : (backend.dirty ? qsTr("Not saved") : qsTr("Saved"))
             color: Theme.textDim
@@ -151,7 +163,6 @@ Window {
             TabButton { label: qsTr("Sync"); icon: "play"; selected: window.tab === 0; onClicked: window.tab = 0 }
             TabButton { objectName: "tabScreen"; enabled: backend.running; label: qsTr("Screen"); icon: "screen"; selected: window.tab === 1; onClicked: window.tab = 1 }
             TabButton { objectName: "tabLights"; enabled: backend.running; label: qsTr("Lights"); icon: "bulb"; selected: window.tab === 2; onClicked: window.tab = 2 }
-            TabButton { objectName: "tabSettings"; label: qsTr("Settings"); icon: "sliders"; selected: window.tab === 3; onClicked: window.tab = 3 }
         }
     }
 

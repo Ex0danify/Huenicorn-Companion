@@ -95,7 +95,7 @@ private slots:
       QVERIFY(!configurator.model().running());
       QVERIFY(!tabEnabled("tabScreen"));
       QVERIFY(!tabEnabled("tabLights"));
-      QVERIFY(tabEnabled("tabSettings"));
+      QVERIFY(tabEnabled("settingsButton"));
 
       controller.beginMonitoring();
       QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
@@ -107,7 +107,47 @@ private slots:
       QTRY_VERIFY_WITH_TIMEOUT(!configurator.model().running(), 5000);
       QTRY_COMPARE_WITH_TIMEOUT(window->property("tab").toInt(), 0, 2000);
       QVERIFY(!tabEnabled("tabScreen"));
-      QVERIFY(tabEnabled("tabSettings"));
+      QVERIFY(tabEnabled("settingsButton"));
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void cogTogglesSettingsAndRestoresPreviousTab()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      auto* cog = window->findChild<QQuickItem*>("settingsButton");
+      QVERIFY(cog != nullptr);
+      QVERIFY(window->findChild<QQuickItem*>("tabSettings") == nullptr);
+
+      auto click = [&](){
+        const QPointF p = cog->mapToScene(QPointF(cog->width() / 2, cog->height() / 2));
+        QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, p.toPoint());
+      };
+
+      window->setProperty("tab", 2);
+      click();
+      QCOMPARE(window->property("tab").toInt(), 3);
+      click();
+      QCOMPARE(window->property("tab").toInt(), 2);
       window->hide();
     }
 
@@ -135,6 +175,8 @@ private slots:
       controller.beginMonitoring();
       QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
 
+      window->setProperty("tab", 3);
+      QTest::qWait(60);
       QVERIFY(visibleTexts(window->contentItem()).contains("Settings"));
 
       localization.setLanguage("de");
@@ -148,6 +190,7 @@ private slots:
         QVERIFY(!window->grabWindow().isNull());
       }
 
+      window->setProperty("tab", 3);
       localization.setLanguage("en");
       QTest::qWait(60);
       QVERIFY(visibleTexts(window->contentItem()).contains("Settings"));

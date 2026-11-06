@@ -55,6 +55,25 @@ Canvas {
                 c.arc(w * xs[i], h * ys[i], w * 0.09, 0, Math.PI * 2)
                 c.fill()
             }
+        } else if (kind === "cog") {
+            var cx = w * 0.5, cy = h * 0.5
+            var ro = w * 0.42, rr = w * 0.31
+            var rad = Math.PI / 180
+            c.beginPath()
+            for (var k = 0; k < 8; k++) {
+                var base = k * 45
+                var steps = [[base - 16, rr], [base - 10, ro], [base + 10, ro], [base + 16, rr]]
+                for (var j = 0; j < 4; j++) {
+                    var px = cx + Math.cos(steps[j][0] * rad) * steps[j][1]
+                    var py = cy + Math.sin(steps[j][0] * rad) * steps[j][1]
+                    if (k === 0 && j === 0) c.moveTo(px, py); else c.lineTo(px, py)
+                }
+            }
+            c.closePath()
+            c.stroke()
+            c.beginPath()
+            c.arc(cx, cy, w * 0.13, 0, Math.PI * 2)
+            c.stroke()
         } else if (kind === "play") {
             c.beginPath()
             c.moveTo(w * 0.3, h * 0.2); c.lineTo(w * 0.8, h * 0.5); c.lineTo(w * 0.3, h * 0.8)
