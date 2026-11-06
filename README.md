@@ -76,9 +76,7 @@ settings, next to its own binary, or on your `PATH`.
 
 ### Installing the daemon from the app
 
-If no daemon is found, the app offers to build Huenicorn from source. It never installs packages or asks for
-administrator rights. If something is missing, it lists it with the install command for your distribution, which you
-run yourself, then check again.
+If no daemon is found, the app offers to build Huenicorn from source. If build dependencies are missing, it lists tehm with the install command for your distribution.
 
 The build is pinned to one daemon version. The app checks that the downloaded source is the exact expected commit and
 verifies the checksum of the three small libraries the daemon would otherwise fetch unchecked. It builds in a

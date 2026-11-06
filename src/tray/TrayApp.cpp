@@ -119,34 +119,36 @@ void TrayApp::buildMenu()
 
 void TrayApp::refresh()
 {
-  using State = DaemonController::State;
+  using enum DaemonController::State;
   const auto state = m_controller.state();
 
   QString text;
   switch(state){
-    case State::Stopped: text = tr("Stopped"); break;
-    case State::Starting: text = tr("Starting..."); break;
-    case State::Running:
+    case Stopped: text = tr("Stopped"); break;
+    case Starting: text = tr("Starting..."); break;
+    case Running:
       text = m_controller.version().isEmpty() ? tr("Streaming") : tr("Streaming (v%1)").arg(m_controller.version());
       break;
-    case State::Stopping: text = tr("Stopping..."); break;
-    case State::Error: text = tr("Error: %1").arg(m_controller.lastError()); break;
+    case Stopping: text = tr("Stopping..."); break;
+    case Error: text = tr("Error: %1").arg(m_controller.lastError()); break;
   }
 
+  // The error is already in the toast, tooltip and log, and a long one stretches the menu
+  m_statusAction->setVisible(state != Error);
   m_statusAction->setText(text);
   m_tray.setIcon(IconFactory::forState(state));
   m_tray.setToolTip(tr("Huenicorn: %1").arg(text));
 
-  const bool idle = (state == State::Stopped || state == State::Error);
-  const bool busy = (state == State::Starting || state == State::Stopping);
+  const bool idle = (state == Stopped || state == Error);
+  const bool busy = (state == Starting || state == Stopping);
   m_startAction->setEnabled(idle);
-  m_stopAction->setEnabled(!idle && state != State::Stopping);
+  m_stopAction->setEnabled(!idle && state != Stopping);
   m_restartAction->setEnabled(!busy);
-  m_webConfigAction->setEnabled(state == State::Running);
+  m_webConfigAction->setEnabled(state == Running);
 }
 
 
-void TrayApp::openWebConfigurator()
+void TrayApp::openWebConfigurator() const
 {
   if(m_controller.state() == DaemonController::State::Running){
     QDesktopServices::openUrl(m_controller.baseUrl());
@@ -190,18 +192,18 @@ void TrayApp::quit()
 
 void TrayApp::finishQuit()
 {
-  using State = DaemonController::State;
+  using enum DaemonController::State;
 
-  const bool running = m_controller.state() == State::Running || m_controller.state() == State::Starting;
-  if(running && m_settings.stopDaemonOnQuit()){
-    connect(&m_controller, &DaemonController::stateChanged, qApp, [](State state){
-      if(state == State::Stopped || state == State::Error){
-        qApp->quit();
+  if(const bool running = m_controller.state() == Running || m_controller.state() == Starting;
+     running && m_settings.stopDaemonOnQuit()){
+    connect(&m_controller, &DaemonController::stateChanged, qApp, [](DaemonController::State state){
+      if(state == Stopped || state == Error){
+        QApplication::quit();
       }
     });
     m_controller.stop();
     return;
   }
 
-  qApp->quit();
+  QApplication::quit();
 }
