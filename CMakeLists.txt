@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(HuenicornCompanion VERSION 0.3.0 LANGUAGES CXX) # x-release-please-version
+project(HuenicornCompanion VERSION 1.0.0 LANGUAGES CXX) # x-release-please-version
 
 option(BUILD_TESTS "Build tests" ON)
 
