@@ -560,7 +560,11 @@ private slots:
       // Clicking elsewhere closes an open list without changing anything
       QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, center);
       QTRY_COMPARE(dropdown->property("open").toBool(), true);
-      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, QPoint(100, center.y() - 90));
+      // The gap above the dropdown is part of the same column and never holds a control. The side margins
+      // do not close the list, and fixed offsets from the dropdown can land outside the window or on a control.
+      const auto away = dropdown->mapToScene(QPointF(dropdown->width() - 20, -6)).toPoint();
+      QVERIFY2(QRect(0, 0, window->width(), window->height()).contains(away), "click target is outside the window");
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, away);
       QTRY_COMPARE(dropdown->property("open").toBool(), false);
       QCOMPARE(localization.active(), QString("de"));
 
