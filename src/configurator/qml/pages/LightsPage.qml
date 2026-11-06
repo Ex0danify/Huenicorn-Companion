@@ -45,7 +45,7 @@ Flickable {
             objectName: "globalGammaCard"
             visible: backend.loaded && backend.channels.length > 0
             width: parent.width
-            height: 76 + 34 + 10
+            height: 76 + 28 + 1
 
             Row {
                 id: globalHeader
@@ -79,8 +79,10 @@ Flickable {
             HueSlider {
                 id: globalGamma
                 objectName: "globalGamma"
-                anchors { top: globalHeader.bottom; left: parent.left; right: parent.right; leftMargin: 8; rightMargin: 8 }
-                trackHeight: 34
+                anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: 1 }
+                trackHeight: 28
+                knobSize: 22
+                barRadius: Theme.radiusCard - 1
                 from: -1
                 to: 1
                 stepSize: 0.1
@@ -96,7 +98,7 @@ Flickable {
                 id: card
                 required property var modelData
                 width: column.width
-                height: 76 + 34 + 10
+                height: 76 + 28 + 1
 
                 Row {
                     id: header
@@ -143,8 +145,10 @@ Flickable {
                 HueSlider {
                     id: gammaSlider
                     objectName: "gammaSlider"
-                    anchors { top: header.bottom; left: parent.left; right: parent.right; leftMargin: 8; rightMargin: 8 }
-                    trackHeight: 34
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: 1 }
+                    trackHeight: 28
+                    knobSize: 22
+                    barRadius: Theme.radiusCard - 1
                     from: -1
                     to: 1
                     stepSize: 0.1
