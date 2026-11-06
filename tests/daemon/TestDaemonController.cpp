@@ -76,12 +76,43 @@ private slots:
     QVERIFY(!controller.lastError().isEmpty());
   }
 
-  void missingBinaryReportsError()
+  void missingBinaryFailsWithoutSpawning()
   {
     DaemonController controller;
     controller.setDaemonPath("/nonexistent/huenicorn");
     controller.start();
-    QVERIFY(waitForState(controller, DaemonController::State::Error));
+    QCOMPARE(controller.state(), DaemonController::State::Error);
+    QVERIFY2(controller.lastError().contains("/nonexistent/huenicorn"), qPrintable(controller.lastError()));
+    QVERIFY(!controller.ownsProcess());
+  }
+
+  void canStartNeedsAnExistingExecutable()
+  {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const auto plain = dir.filePath("plain");
+    QFile file(plain);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+
+    DaemonController controller;
+    QVERIFY(!controller.canStart());
+    controller.setDaemonPath("/nonexistent/huenicorn");
+    QVERIFY(!controller.canStart());
+    controller.setDaemonPath(plain);
+    QVERIFY(!controller.canStart());
+    file.setPermissions(file.permissions() | QFileDevice::ExeOwner);
+    QVERIFY(controller.canStart());
+  }
+
+  void checkNowAdoptsExternalDaemonWithoutWaiting()
+  {
+    FakeDaemonApi api;
+    DaemonController controller;
+    controller.setPort(api.port());
+    controller.setPollIntervalMs(60000);
+    controller.checkNow();
+    QVERIFY(waitForState(controller, DaemonController::State::Running));
   }
 
   void ownedProcessLifecycle()

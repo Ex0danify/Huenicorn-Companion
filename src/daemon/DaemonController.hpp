@@ -34,6 +34,9 @@ public:
   QString daemonPath() const;
   void setDaemonPath(const QString& path);
 
+  // False when the configured binary is unset, gone or not executable
+  bool canStart() const;
+
   int port() const;
   void setPort(int port);
 
@@ -47,6 +50,9 @@ public:
   void setPollingPaused(bool paused);
 
   void beginMonitoring();
+
+  // Probes the daemon right away instead of waiting for the next poll
+  void checkNow();
 
 public slots:
   void start();

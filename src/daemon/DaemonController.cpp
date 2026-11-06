@@ -1,5 +1,6 @@
 #include "daemon/DaemonController.hpp"
 
+#include <QFileInfo>
 #include <QJsonObject>
 #include <QStandardPaths>
 #include <QUrl>
@@ -119,6 +120,18 @@ void DaemonController::setPollingPaused(bool paused)
 }
 
 
+bool DaemonController::canStart() const
+{
+  return !m_daemonPath.isEmpty() && QFileInfo(m_daemonPath).isExecutable();
+}
+
+
+void DaemonController::checkNow()
+{
+  poll();
+}
+
+
 void DaemonController::beginMonitoring()
 {
   m_pollTimer.start();
@@ -134,6 +147,11 @@ void DaemonController::start()
 
   if(m_daemonPath.isEmpty()){
     fail(tr("Huenicorn daemon binary not found. Set its path in the settings."));
+    return;
+  }
+
+  if(!canStart()){
+    fail(tr("Huenicorn daemon binary not found or not executable: %1").arg(m_daemonPath));
     return;
   }
 
