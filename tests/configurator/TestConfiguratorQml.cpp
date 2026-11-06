@@ -68,6 +68,52 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void disablesScreenAndLightsWithoutDaemon()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->show();
+
+      auto tabEnabled = [&](const char* name){
+        auto* item = window->findChild<QQuickItem*>(name);
+        return item != nullptr && item->isEnabled();
+      };
+      QVERIFY(window->findChild<QQuickItem*>("tabScreen") != nullptr);
+
+      QVERIFY(!configurator.model().running());
+      QVERIFY(!tabEnabled("tabScreen"));
+      QVERIFY(!tabEnabled("tabLights"));
+      QVERIFY(tabEnabled("tabSettings"));
+
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+      QVERIFY(tabEnabled("tabScreen"));
+      QVERIFY(tabEnabled("tabLights"));
+
+      window->setProperty("tab", 1);
+      api.close();
+      QTRY_VERIFY_WITH_TIMEOUT(!configurator.model().running(), 5000);
+      QTRY_COMPARE_WITH_TIMEOUT(window->property("tab").toInt(), 0, 2000);
+      QVERIFY(!tabEnabled("tabScreen"));
+      QVERIFY(tabEnabled("tabSettings"));
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void retranslatesLiveWithoutWarnings()
   {
     {

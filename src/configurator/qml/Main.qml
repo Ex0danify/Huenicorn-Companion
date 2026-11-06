@@ -39,6 +39,8 @@ Window {
         target: backend
         function onSaved(ok) { if(!ok) window.toast(qsTr("Could not save profile")) }
         function onRequestFailed(message) { window.toast(message) }
+        // Screen and Lights are disabled without a daemon
+        function onDaemonStateChanged() { if(!backend.running && (window.tab === 1 || window.tab === 2)) window.tab = 0 }
     }
 
     // Soft glow behind the header
@@ -147,9 +149,9 @@ Window {
             spacing: 14
 
             TabButton { label: qsTr("Sync"); icon: "play"; selected: window.tab === 0; onClicked: window.tab = 0 }
-            TabButton { label: qsTr("Screen"); icon: "screen"; selected: window.tab === 1; onClicked: window.tab = 1 }
-            TabButton { label: qsTr("Lights"); icon: "bulb"; selected: window.tab === 2; onClicked: window.tab = 2 }
-            TabButton { label: qsTr("Settings"); icon: "sliders"; selected: window.tab === 3; onClicked: window.tab = 3 }
+            TabButton { objectName: "tabScreen"; enabled: backend.running; label: qsTr("Screen"); icon: "screen"; selected: window.tab === 1; onClicked: window.tab = 1 }
+            TabButton { objectName: "tabLights"; enabled: backend.running; label: qsTr("Lights"); icon: "bulb"; selected: window.tab === 2; onClicked: window.tab = 2 }
+            TabButton { objectName: "tabSettings"; label: qsTr("Settings"); icon: "sliders"; selected: window.tab === 3; onClicked: window.tab = 3 }
         }
     }
 
