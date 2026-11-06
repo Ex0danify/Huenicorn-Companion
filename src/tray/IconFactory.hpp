@@ -6,7 +6,7 @@
 
 namespace IconFactory
 {
-  // Horn silhouette tinted by the daemon state
+  // Monitor with a unicorn head, tinted by the daemon state
   QIcon forState(DaemonController::State state);
 
   QColor colorFor(DaemonController::State state);
