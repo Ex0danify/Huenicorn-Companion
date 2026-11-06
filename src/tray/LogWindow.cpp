@@ -13,6 +13,15 @@ LogWindow::LogWindow(QWidget* parent)
 }
 
 
+void LogWindow::changeEvent(QEvent* event)
+{
+  if(event->type() == QEvent::LanguageChange){
+    setWindowTitle(tr("Huenicorn log"));
+  }
+  QPlainTextEdit::changeEvent(event);
+}
+
+
 void LogWindow::append(const QString& line)
 {
   appendPlainText(line);

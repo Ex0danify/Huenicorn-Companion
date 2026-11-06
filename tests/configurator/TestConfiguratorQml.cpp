@@ -1,5 +1,6 @@
 #include <QtTest>
 
+#include <QQuickItem>
 #include <QQuickWindow>
 
 #include "FakeDaemonApi.hpp"
@@ -14,6 +15,9 @@ class TestConfiguratorQml : public QObject
 private slots:
   void initTestCase()
   {
+    // Settings would otherwise write into the real user config
+    QVERIFY(m_config.isValid());
+    qputenv("XDG_CONFIG_HOME", m_config.path().toUtf8());
     qInstallMessageHandler([](QtMsgType type, const QMessageLogContext&, const QString& message){
       if(type == QtWarningMsg || type == QtCriticalMsg){
         warnings().append(message);
@@ -41,7 +45,9 @@ private slots:
       controller.setPollIntervalMs(100);
       UpdateController updater("0.1.0");
       DaemonInstaller installer(PinnedDaemon::current());
-      ConfiguratorWindow configurator(controller, updater, installer);
+      Settings settings;
+      Localization localization(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -61,6 +67,49 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void retranslatesLiveWithoutWarnings()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      localization.setLanguage("en");
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+
+      QVERIFY(visibleTexts(window->contentItem()).contains("Settings"));
+
+      localization.setLanguage("de");
+      QTest::qWait(60);
+      const auto german = visibleTexts(window->contentItem());
+      QVERIFY(german.contains("Einstellungen"));
+      QVERIFY(!german.contains("Settings"));
+      for(int tab = 0; tab < 4; tab++){
+        window->setProperty("tab", tab);
+        QTest::qWait(60);
+        QVERIFY(!window->grabWindow().isNull());
+      }
+
+      localization.setLanguage("en");
+      QTest::qWait(60);
+      QVERIFY(visibleTexts(window->contentItem()).contains("Settings"));
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void rendersEverySetupStepWithoutWarnings()
   {
     {
@@ -73,7 +122,9 @@ private slots:
       controller.setPollIntervalMs(100);
       UpdateController updater("0.1.0");
       DaemonInstaller installer(PinnedDaemon::current());
-      ConfiguratorWindow configurator(controller, updater, installer);
+      Settings settings;
+      Localization localization(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -150,7 +201,9 @@ private slots:
         return 0;
       };
 
-      ConfiguratorWindow configurator(controller, updater, installer);
+      Settings settings;
+      Localization localization(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization);
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
       window->show();
@@ -195,6 +248,20 @@ private slots:
   }
 
 private:
+  QTemporaryDir m_config;
+
+  static QStringList visibleTexts(QQuickItem* item)
+  {
+    QStringList texts;
+    if(item->isVisible() && item->property("text").isValid()){
+      texts.append(item->property("text").toString());
+    }
+    for(auto* child : item->childItems()){
+      texts.append(visibleTexts(child));
+    }
+    return texts;
+  }
+
   static QStringList& warnings()
   {
     static QStringList list;

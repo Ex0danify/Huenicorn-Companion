@@ -11,4 +11,7 @@ public:
 
 public slots:
   void append(const QString& line);
+
+protected:
+  void changeEvent(QEvent* event) override;
 };

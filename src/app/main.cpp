@@ -7,6 +7,7 @@
 
 #include "configurator/ConfiguratorWindow.hpp"
 #include "daemon/DaemonController.hpp"
+#include "i18n/Localization.hpp"
 #include "installer/DaemonInstaller.hpp"
 #include "settings/Settings.hpp"
 #include "tray/TrayApp.hpp"
@@ -21,12 +22,14 @@ int main(int argc, char* argv[])
   app.setDesktopFileName("huenicorn-qt");
   app.setQuitOnLastWindowClosed(false);
 
+  Settings settings;
+  Localization localization(settings);
+
   if(!QSystemTrayIcon::isSystemTrayAvailable()){
     QMessageBox::critical(nullptr, QCoreApplication::translate("App", "Huenicorn"), QCoreApplication::translate("App", "No system tray available on this desktop."));
     return 1;
   }
 
-  Settings settings;
   DaemonController controller;
   controller.setDaemonPath(settings.resolvedDaemonPath());
   controller.setPort(settings.port());
@@ -52,7 +55,8 @@ int main(int argc, char* argv[])
   });
 
   TrayApp tray(controller, settings);
-  ConfiguratorWindow configurator(controller, updater, installer);
+  QObject::connect(&localization, &Localization::changed, &tray, &TrayApp::retranslate);
+  ConfiguratorWindow configurator(controller, updater, installer, localization);
   QObject::connect(&tray, &TrayApp::configuratorRequested, &configurator, &ConfiguratorWindow::show);
 
   tray.setPreQuitStep([&configurator](TrayApp::Continuation proceed){

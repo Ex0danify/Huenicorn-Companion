@@ -29,6 +29,10 @@ public:
   QString skippedUpdateVersion() const;
   void setSkippedUpdateVersion(const QString& version);
 
+  // "auto" follows the system language, otherwise a language code like "de"
+  QString language() const;
+  void setLanguage(const QString& language);
+
   // Configured path, or the first "huenicorn" found next to us or on PATH
   QString resolvedDaemonPath() const;
 

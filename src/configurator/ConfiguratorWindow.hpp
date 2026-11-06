@@ -4,6 +4,7 @@
 #include <QQmlApplicationEngine>
 
 #include "configurator/ConfiguratorModel.hpp"
+#include "i18n/Localization.hpp"
 #include "installer/DaemonInstaller.hpp"
 #include "updater/UpdateController.hpp"
 
@@ -15,7 +16,7 @@ class ConfiguratorWindow : public QObject
   Q_OBJECT
 
 public:
-  ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, QObject* parent = nullptr);
+  ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, Localization& localization, QObject* parent = nullptr);
 
   ConfiguratorModel& model();
   QQuickWindow* window();
