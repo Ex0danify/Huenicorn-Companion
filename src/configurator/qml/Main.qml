@@ -165,7 +165,7 @@ Window {
             anchors.centerIn: parent
             spacing: 14
 
-            TabButton { label: qsTr("Sync"); icon: "play"; selected: window.tab === 0; onClicked: window.tab = 0 }
+            TabButton { label: qsTr("Sync"); icon: "sync"; selected: window.tab === 0; onClicked: window.tab = 0 }
             TabButton { objectName: "tabScreen"; enabled: backend.running; label: qsTr("Screen"); icon: "screen"; selected: window.tab === 1; onClicked: window.tab = 1 }
             TabButton { objectName: "tabLights"; enabled: backend.running; label: qsTr("Lights"); icon: "bulb"; selected: window.tab === 2; onClicked: window.tab = 2 }
         }

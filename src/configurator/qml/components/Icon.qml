@@ -79,6 +79,29 @@ Canvas {
             c.moveTo(w * 0.3, h * 0.2); c.lineTo(w * 0.8, h * 0.5); c.lineTo(w * 0.3, h * 0.8)
             c.closePath()
             c.fill()
+        } else if (kind === "stop") {
+            c.beginPath()
+            c.roundedRect(w * 0.26, h * 0.26, w * 0.48, h * 0.48, 2, 2)
+            c.fill()
+        } else if (kind === "sync") {
+            var sx = w * 0.5, sy = h * 0.5, sr = w * 0.34
+            var head = w * 0.14
+            var span = Math.PI * 0.72
+            // Arrowheads end at the top right and bottom left, each arc leaves a gap behind its head
+            for (var a = 0; a < 2; a++) {
+                var end = -Math.PI * 0.25 + a * Math.PI
+                c.beginPath()
+                c.arc(sx, sy, sr, end - span, end)
+                c.stroke()
+                var ex = sx + Math.cos(end) * sr, ey = sy + Math.sin(end) * sr
+                var tx = -Math.sin(end), ty = Math.cos(end)
+                var nx = Math.cos(end), ny = Math.sin(end)
+                c.beginPath()
+                c.moveTo(ex - tx * head * 0.2 + nx * head, ey - ty * head * 0.2 + ny * head)
+                c.lineTo(ex + tx * head * 0.9, ey + ty * head * 0.9)
+                c.lineTo(ex - tx * head * 0.2 - nx * head, ey - ty * head * 0.2 - ny * head)
+                c.stroke()
+            }
         } else if (kind === "chevron") {
             c.beginPath()
             c.moveTo(w * 0.3, h * 0.38); c.lineTo(w * 0.5, h * 0.62); c.lineTo(w * 0.7, h * 0.38)
