@@ -159,6 +159,56 @@ private slots:
     QCOMPARE(f.api.lastBody("/api/setTransitionSmoothing"), QByteArray("95"));
   }
 
+  void gammaIsSentAsObjectAndStored()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+
+    f.model->setChannelGamma(0, 0.4);
+    QTRY_COMPARE(f.api.count("PUT", "/api/setChannelGammaFactor/0"), 1);
+    const auto body = QJsonDocument::fromJson(f.api.lastBody("/api/setChannelGammaFactor/0")).object();
+    QCOMPARE(body.value("gammaFactor").toDouble(), 0.4);
+    QCOMPARE(f.api.channels.at(0).toObject().value("gammaFactor").toDouble(), 0.4);
+    QCOMPARE(f.channel(0).value("gamma").toDouble(), 0.4);
+  }
+
+  void failedSettingsFallBackToTheDaemonState()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+    QSignalSpy failed(f.model.get(), &ConfiguratorModel::requestFailed);
+
+    f.api.failPaths = {"/api/setChannelGammaFactor/0", "/api/setRefreshRate",
+                       "/api/setInterpolation", "/api/setTransitionSmoothing"};
+    f.model->setChannelGamma(0, 0.5);
+    f.model->setRefreshRate(100);
+    f.model->setInterpolation(0);
+    f.model->setSmoothing(50);
+    QCOMPARE(f.channel(0).value("gamma").toDouble(), 0.5);
+    QCOMPARE(f.model->refreshRate(), 100);
+
+    QTRY_COMPARE(failed.count(), 4);
+    QCOMPARE(f.channel(0).value("gamma").toDouble(), 0.0);
+    QCOMPARE(f.model->refreshRate(), 60);
+    QCOMPARE(f.model->interpolation(), 2);
+    QCOMPARE(f.model->smoothing(), 15.0);
+    QVERIFY(!f.model->dirty());
+  }
+
+  void failedRequestDoesNotCancelAPendingSave()
+  {
+    Fixture f;
+    QTRY_VERIFY(f.model->loaded());
+
+    f.model->setInterpolation(1);
+    QTRY_VERIFY(f.model->dirty());
+    f.api.failPaths = {"/api/setChannelActivity/1"};
+    f.model->setChannelActive(1, true);
+
+    QTRY_COMPARE(f.api.count("GET", "/api/channels"), 2);
+    QTRY_COMPARE(f.api.count("POST", "/api/saveProfile"), 1);
+  }
+
   void selectingAreaSendsIdAsJsonString()
   {
     Fixture f;

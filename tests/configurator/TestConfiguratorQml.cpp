@@ -160,6 +160,116 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void gammaBubbleShowsOnHoverAndWhileDragging()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+      window->setProperty("tab", 2);
+
+      auto slider = [window](){ return itemByName(window->contentItem(), "gammaSlider"); };
+      auto bubbleOpacity = [&slider](){
+        auto* bubble = slider() ? itemByName(slider(), "valueBubble") : nullptr;
+        return bubble ? bubble->property("opacity").toDouble() : -1.0;
+      };
+      QTRY_VERIFY_WITH_TIMEOUT(slider() != nullptr, 3000);
+      QTest::qWait(200);
+      QCOMPARE(bubbleOpacity(), 0.0);
+
+      const auto target = slider()->mapToScene(QPointF(slider()->width() * 0.75, slider()->height() / 2)).toPoint();
+      QTest::mouseMove(window, target);
+      QCOMPARE(bubbleOpacity(), 0.0);
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 1.0, 2000);
+      QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor"), 0);
+      QTest::mouseMove(window, QPoint(5, 5));
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 0.0, 2000);
+
+      QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, target);
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 1.0, 2000);
+      QVERIFY(slider()->property("popupText").toString().startsWith("Gamma +"));
+      QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor"), 0);
+
+      QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, target);
+      QTRY_COMPARE_WITH_TIMEOUT(api.count("PUT", "/api/setChannelGammaFactor/0"), 1, 3000);
+      QTRY_COMPARE_WITH_TIMEOUT(bubbleOpacity(), 0.0, 2000);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void doubleClickOnGammaKnobResetsToNeutral()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      window->show();
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+      window->setProperty("tab", 2);
+
+      auto slider = [window](){ return itemByName(window->contentItem(), "gammaSlider"); };
+      QTRY_VERIFY_WITH_TIMEOUT(slider() != nullptr, 3000);
+      QTest::qWait(200);
+
+      configurator.model().setChannelGamma(0, 0.6);
+      QTRY_COMPARE_WITH_TIMEOUT(api.channels.at(0).toObject().value("gammaFactor").toDouble(), 0.6, 3000);
+      QTest::qWait(200);
+
+      auto* knob = itemByName(slider(), "knob");
+      QVERIFY(knob != nullptr);
+      const auto onKnob = knob->mapToScene(QPointF(knob->width() / 2, knob->height() / 2)).toPoint();
+      // A plain click on the knob changes nothing, so it must not send anything
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, onKnob);
+      QTest::qWait(300);
+      QCOMPARE(api.count("PUT", "/api/setChannelGammaFactor/0"), 1);
+
+      // Resting on the knob shows the value, resetting must not make the bubble blink
+      QTest::mouseMove(window, onKnob);
+      auto* bubble = itemByName(slider(), "valueBubble");
+      QVERIFY(bubble != nullptr);
+      QTRY_COMPARE_WITH_TIMEOUT(bubble->property("opacity").toDouble(), 1.0, 2000);
+
+      QTest::mouseDClick(window, Qt::LeftButton, Qt::NoModifier, onKnob);
+      double lowest = 1.0;
+      for(int i = 0; i < 35; i++){
+        QTest::qWait(20);
+        lowest = std::min(lowest, bubble->property("opacity").toDouble());
+      }
+      QCOMPARE(lowest, 1.0);
+
+      QTRY_COMPARE_WITH_TIMEOUT(api.channels.at(0).toObject().value("gammaFactor").toDouble(), 0.0, 3000);
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void savedLabelFadesOutAfterSaving()
   {
     {

@@ -289,13 +289,13 @@
         <source>Channel %1</source>
         <translation>Kanal %1</translation>
     </message>
-    <message>
-        <source>Gamma</source>
-        <translation>Gamma</translation>
-    </message>
 </context>
 <context>
     <name>LightsPage</name>
+    <message>
+        <source>Gamma %1</source>
+        <translation>Gamma %1</translation>
+    </message>
     <message>
         <source>Lights</source>
         <translation>Lichter</translation>

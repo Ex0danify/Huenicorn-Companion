@@ -5,6 +5,10 @@ import "../components"
 Flickable {
     id: page
 
+    function gammaText(v) {
+        return qsTr("Gamma %1").arg((v > 0 ? "+" : "") + v.toLocaleString(Qt.locale(), "f", 1))
+    }
+
     contentHeight: column.height + 8
     clip: true
     boundsBehavior: Flickable.StopAtBounds
@@ -31,17 +35,23 @@ Flickable {
             visible: !backend.loaded
         }
 
+        // Sized by count so a value update keeps the cards, and with them hover and drag state
         Repeater {
-            model: backend.channels
+            model: backend.channels.length
 
             delegate: Card {
                 id: card
-                required property var modelData
+                required property int index
+                readonly property var modelData: backend.channels[index] || ({
+                    channelId: -1, name: "", active: false, color: "#000000", gamma: 0
+                })
                 width: column.width
-                height: 76
+                height: 76 + 28 + 1
 
                 Row {
-                    anchors { fill: parent; leftMargin: 20; rightMargin: 20 }
+                    id: header
+                    height: 76
+                    anchors { left: parent.left; right: parent.right; leftMargin: 20; rightMargin: 20 }
                     spacing: 14
 
                     Rectangle {
@@ -78,6 +88,22 @@ Flickable {
                         checked: card.modelData.active
                         onToggled: (on) => backend.setChannelActive(card.modelData.channelId, on)
                     }
+                }
+
+                HueSlider {
+                    id: gammaSlider
+                    objectName: "gammaSlider"
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: 1 }
+                    trackHeight: 28
+                    knobSize: 22
+                    barRadius: Theme.radiusCard - 1
+                    from: -1
+                    to: 1
+                    stepSize: 0.1
+                    resetValue: 0
+                    value: card.modelData.gamma
+                    popupText: page.gammaText(displayValue)
+                    onCommitted: (v) => backend.setChannelGamma(card.modelData.channelId, v)
                 }
             }
         }
