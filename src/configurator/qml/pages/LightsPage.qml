@@ -9,10 +9,6 @@ Flickable {
     clip: true
     boundsBehavior: Flickable.StopAtBounds
 
-    function gammaText(v) {
-        return (v > 0 ? "+" : "") + v.toLocaleString(Qt.locale(), "f", 1)
-    }
-
     function averageGamma() {
         const list = backend.channels
         if (list.length === 0)
@@ -49,40 +45,47 @@ Flickable {
             objectName: "globalGammaCard"
             visible: backend.loaded && backend.channels.length > 0
             width: parent.width
-            height: 88
+            height: 76 + 34 + 10
 
-            Column {
-                x: 20; y: 14
-                width: parent.width - 40
-                spacing: 6
+            Row {
+                id: globalHeader
+                height: 76
+                anchors { left: parent.left; right: parent.right; leftMargin: 20; rightMargin: 20 }
+                spacing: 14
 
-                Row {
-                    width: parent.width
+                Rectangle {
+                    width: 40; height: 40; radius: 20
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.surfaceRaised
+                    Icon { anchors.centerIn: parent; kind: "bulb"; color: Theme.text }
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
                     Text {
-                        width: parent.width - globalGammaValue.width
-                        text: qsTr("Gamma for all lights")
+                        text: qsTr("All lights")
                         color: Theme.text
-                        font.pixelSize: Theme.fontBody
+                        font.pixelSize: Theme.fontBody + 1
                         font.bold: true
                     }
                     Text {
-                        id: globalGammaValue
-                        text: page.gammaText(globalGamma.displayValue)
+                        text: qsTr("Gamma")
                         color: Theme.textDim
-                        font.pixelSize: Theme.fontBody
+                        font.pixelSize: Theme.fontSmall + 1
                     }
                 }
+            }
 
-                HueSlider {
-                    id: globalGamma
-                    objectName: "globalGamma"
-                    width: parent.width
-                    from: -1
-                    to: 1
-                    stepSize: 0.1
-                    value: page.averageGamma()
-                    onCommitted: (v) => backend.setAllChannelsGamma(v)
-                }
+            HueSlider {
+                id: globalGamma
+                objectName: "globalGamma"
+                anchors { top: globalHeader.bottom; left: parent.left; right: parent.right; leftMargin: 8; rightMargin: 8 }
+                trackHeight: 34
+                from: -1
+                to: 1
+                stepSize: 0.1
+                value: page.averageGamma()
+                onCommitted: (v) => backend.setAllChannelsGamma(v)
             }
         }
 
@@ -93,7 +96,7 @@ Flickable {
                 id: card
                 required property var modelData
                 width: column.width
-                height: 76 + 62
+                height: 76 + 34 + 10
 
                 Row {
                     id: header
@@ -137,36 +140,16 @@ Flickable {
                     }
                 }
 
-                Column {
-                    anchors { top: header.bottom; left: parent.left; right: parent.right; leftMargin: 20; rightMargin: 20 }
-                    spacing: 4
-
-                    Row {
-                        width: parent.width
-                        Text {
-                            width: parent.width - gammaValue.width
-                            text: qsTr("Gamma")
-                            color: Theme.textDim
-                            font.pixelSize: Theme.fontSmall + 1
-                        }
-                        Text {
-                            id: gammaValue
-                            text: page.gammaText(gammaSlider.displayValue)
-                            color: Theme.textDim
-                            font.pixelSize: Theme.fontSmall + 1
-                        }
-                    }
-
-                    HueSlider {
-                        id: gammaSlider
-                        objectName: "gammaSlider"
-                        width: parent.width
-                        from: -1
-                        to: 1
-                        stepSize: 0.1
-                        value: card.modelData.gamma
-                        onCommitted: (v) => backend.setChannelGamma(card.modelData.channelId, v)
-                    }
+                HueSlider {
+                    id: gammaSlider
+                    objectName: "gammaSlider"
+                    anchors { top: header.bottom; left: parent.left; right: parent.right; leftMargin: 8; rightMargin: 8 }
+                    trackHeight: 34
+                    from: -1
+                    to: 1
+                    stepSize: 0.1
+                    value: card.modelData.gamma
+                    onCommitted: (v) => backend.setChannelGamma(card.modelData.channelId, v)
                 }
             }
         }

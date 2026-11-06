@@ -301,7 +301,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Gamma for all lights</source>
+        <source>All lights</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

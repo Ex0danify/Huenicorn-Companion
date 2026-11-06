@@ -8,6 +8,8 @@ Item {
     property real to: 1
     property real value: 0
     property real stepSize: 0
+    // A track taller than the knob turns the slider into a bar the knob sits inside
+    property real trackHeight: 14
     property color startColor: Theme.accentDeep
     property color endColor: "#e8f1fa"
 
@@ -20,7 +22,8 @@ Item {
     signal moved(real value)
     signal committed(real value)
 
-    implicitHeight: 34
+    implicitHeight: Math.max(34, trackHeight)
+    readonly property real _inset: Math.max(0, (trackHeight - knob.height) / 2)
     opacity: enabled ? 1 : 0.4
 
     readonly property real ratio: to > from ? Math.max(0, Math.min(1, (displayValue - from) / (to - from))) : 0
@@ -28,8 +31,8 @@ Item {
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
-        height: 14
-        radius: 7
+        height: root.trackHeight
+        radius: height / 2
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0; color: root.startColor }
@@ -41,7 +44,7 @@ Item {
         id: knob
         width: 30; height: 30; radius: 15
         anchors.verticalCenter: parent.verticalCenter
-        x: root.ratio * (root.width - width)
+        x: root._inset + root.ratio * (root.width - width - 2 * root._inset)
         color: "white"
         scale: area.pressed ? 1.1 : 1
         Behavior on scale { NumberAnimation { duration: 90 } }
@@ -53,7 +56,7 @@ Item {
         cursorShape: Qt.PointingHandCursor
 
         function update(mx) {
-            var r = Math.max(0, Math.min(1, (mx - knob.width / 2) / (root.width - knob.width)))
+            var r = Math.max(0, Math.min(1, (mx - root._inset - knob.width / 2) / (root.width - knob.width - 2 * root._inset)))
             var v = root.from + r * (root.to - root.from)
             if (root.stepSize > 0)
                 v = Math.round(v / root.stepSize) * root.stepSize
