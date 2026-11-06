@@ -139,7 +139,7 @@ Item {
 
                     Text {
                         width: parent.width
-                        text: qsTr("Press the link button")
+                        text: qsTr("Press the pairing button")
                         color: Theme.text
                         font.pixelSize: 20
                         font.bold: true
@@ -147,7 +147,7 @@ Item {
                     }
                     Text {
                         width: parent.width
-                        text: qsTr("Press the large button on your bridge, then click Pair. Huenicorn keeps trying for about 30 seconds.")
+                        text: qsTr("Press the pairing button on your bridge, then click Pair. Huenicorn keeps trying for about 30 seconds.")
                         color: Theme.textDim
                         font.pixelSize: Theme.fontBody
                         wrapMode: Text.WordWrap

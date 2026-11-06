@@ -37,10 +37,10 @@ Card {
                 case "upToDate": return qsTr("You are up to date.")
                 case "available": return updater.canInstall
                     ? qsTr("Version %1 is available.").arg(updater.latestVersion)
-                    : qsTr("Version %1 is available, but there is no package for this system.").arg(updater.latestVersion)
+                    : qsTr("Version %1 is available, but there is no installable package for this system.").arg(updater.latestVersion)
                 case "downloading": return qsTr("Downloading version %1...").arg(updater.latestVersion)
                 case "installing": return qsTr("Installing... confirm the password prompt if one appears.")
-                case "installed": return qsTr("Version %1 is installed. Restart to use it.").arg(updater.latestVersion)
+                case "installed": return qsTr("Version %1 is installed. Restart the app to use it.").arg(updater.latestVersion)
                 case "failed": return updater.errorText
                 default: return ""
                 }

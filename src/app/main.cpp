@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   app.setQuitOnLastWindowClosed(false);
 
   if(!QSystemTrayIcon::isSystemTrayAvailable()){
-    QMessageBox::critical(nullptr, QObject::tr("Huenicorn"), QObject::tr("No system tray available on this desktop."));
+    QMessageBox::critical(nullptr, QCoreApplication::translate("App", "Huenicorn"), QCoreApplication::translate("App", "No system tray available on this desktop."));
     return 1;
   }
 
@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
   });
 
   QObject::connect(&updater, &UpdateController::backgroundUpdateFound, [&tray](const QString& version){
-    tray.notify(QObject::tr("Huenicorn update available"),
-                QObject::tr("Version %1 is available. Open the configurator and go to Settings to install it.").arg(version));
+    tray.notify(QCoreApplication::translate("App", "Huenicorn Companion update available"),
+                QCoreApplication::translate("App", "Version %1 of Huenicorn Companion is available. Open the configurator and go to Settings to install it.").arg(version));
   });
 
   // The installed binary is replaced on disk, so ask the new one to start once this instance is gone

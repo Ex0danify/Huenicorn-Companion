@@ -49,7 +49,7 @@ Item {
 
                     Text {
                         width: parent.width
-                        text: qsTr("The Huenicorn daemon does the actual light sync. This app can build version %1 from source and install it for your user only. No administrator rights are needed.").arg(installer.version)
+                        text: qsTr("The Huenicorn daemon does the actual light sync. This app can build version %1 from source and install it for your user.").arg(installer.version)
                         color: Theme.textDim
                         font.pixelSize: Theme.fontBody
                         wrapMode: Text.WordWrap
@@ -182,7 +182,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: qsTr("This downloads the source, checks that it is the expected version, fetches three small libraries and verifies their checksums, then compiles everything on this computer. It takes a few minutes.")
+                            text: qsTr("This downloads the source, checks integrity and then compiles everything on this computer. It takes a few minutes.")
                             color: Theme.textDim
                             font.pixelSize: Theme.fontBody
                             wrapMode: Text.WordWrap

@@ -84,7 +84,7 @@ void TrayApp::buildMenu()
   m_menu.addSeparator();
 
   auto* settings = m_menu.addMenu(tr("Settings"));
-  m_autostartDaemonAction = settings->addAction(tr("Start streaming when the tray starts"));
+  m_autostartDaemonAction = settings->addAction(tr("Start light sync on app start"));
   m_autostartDaemonAction->setCheckable(true);
   m_autostartDaemonAction->setChecked(m_settings.autostartDaemon());
   connect(m_autostartDaemonAction, &QAction::toggled, this, [this](bool on){
@@ -127,7 +127,7 @@ void TrayApp::refresh()
     case Stopped: text = tr("Stopped"); break;
     case Starting: text = tr("Starting..."); break;
     case Running:
-      text = m_controller.version().isEmpty() ? tr("Streaming") : tr("Streaming (v%1)").arg(m_controller.version());
+      text = m_controller.version().isEmpty() ? tr("Syncing") : tr("Syncing (v%1)").arg(m_controller.version());
       break;
     case Stopping: text = tr("Stopping..."); break;
     case Error: text = tr("Error: %1").arg(m_controller.lastError()); break;

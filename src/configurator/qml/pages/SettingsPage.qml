@@ -59,7 +59,7 @@ Flickable {
                             Text {
                                 id: chipText
                                 anchors.centerIn: parent
-                                text: chip.modelData.label + "  " + chip.modelData.percent + "%"
+                                text: qsTr("%1  %2%").arg(chip.modelData.label).arg(chip.modelData.percent)
                                 color: chip.selected ? "#14181d" : Theme.textDim
                                 font.pixelSize: Theme.fontSmall + 1
                                 font.bold: chip.selected
@@ -107,7 +107,7 @@ Flickable {
                     }
                     Text {
                         id: smoothValue
-                        text: Math.round(smooth.displayValue) + "%"
+                        text: qsTr("%1%").arg(Math.round(smooth.displayValue))
                         color: Theme.textDim
                         font.pixelSize: Theme.fontBody
                     }

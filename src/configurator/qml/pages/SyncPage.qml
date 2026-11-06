@@ -70,7 +70,7 @@ Item {
                         spacing: 2
                         Text {
                             width: parent.width
-                            text: backend.currentAreaName || qsTr("No area selected")
+                            text: backend.currentAreaName || qsTr("No entertainment area selected")
                             color: Theme.textOnAccent
                             font.pixelSize: 20
                             font.bold: true
@@ -182,7 +182,7 @@ Item {
                     }
                     Text {
                         id: hz
-                        text: Math.round(rate.displayValue) + " Hz"
+                        text: qsTr("%1 Hz").arg(Math.round(rate.displayValue))
                         color: Theme.textDim
                         font.pixelSize: Theme.fontBody
                     }

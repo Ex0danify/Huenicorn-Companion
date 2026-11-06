@@ -1,5 +1,6 @@
 #include "installer/Requirements.hpp"
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QMap>
 #include <QObject>
@@ -151,23 +152,23 @@ QList<Requirement> Requirements::check(SessionType session, const HostProbe& pro
     list.append({id, label, met});
   };
 
-  add("git", QObject::tr("git"), probe.hasTool("git"));
-  add("cmake", QObject::tr("cmake"), probe.hasTool("cmake"));
-  add("compiler", QObject::tr("C++ compiler"), anyTool(probe, {"c++", "g++", "clang++"}));
-  add("make", QObject::tr("make"), anyTool(probe, {"make", "ninja"}));
-  add("tar", QObject::tr("tar"), probe.hasTool("tar"));
-  add("xz", QObject::tr("xz"), probe.hasTool("xz"));
-  add("pkgconf", QObject::tr("pkg-config"), anyTool(probe, {"pkg-config", "pkgconf"}));
-  add("curl", QObject::tr("libcurl development files"), probe.hasModules({"libcurl"}));
-  add("opencv", QObject::tr("OpenCV development files"), probe.hasModules({"opencv4"}));
-  add("mbedtls", QObject::tr("Mbed TLS %1 or newer development files").arg(MinMbedtlsMajor),
+  add("git", "git", probe.hasTool("git"));
+  add("cmake", "cmake", probe.hasTool("cmake"));
+  add("compiler", QCoreApplication::translate("Requirements", "C++ compiler"), anyTool(probe, {"c++", "g++", "clang++"}));
+  add("make", "make", anyTool(probe, {"make", "ninja"}));
+  add("tar", "tar", probe.hasTool("tar"));
+  add("xz", "xz", probe.hasTool("xz"));
+  add("pkgconf", "pkg-config", anyTool(probe, {"pkg-config", "pkgconf"}));
+  add("curl", QCoreApplication::translate("Requirements", "libcurl development files"), probe.hasModules({"libcurl"}));
+  add("opencv", QCoreApplication::translate("Requirements", "OpenCV development files"), probe.hasModules({"opencv4"}));
+  add("mbedtls", QCoreApplication::translate("Requirements", "Mbed TLS %1 or newer development files").arg(MinMbedtlsMajor),
       probe.mbedtlsMajor() >= MinMbedtlsMajor);
 
   if(session != SessionType::Wayland){
-    add("x11", QObject::tr("X11 development files"), probe.hasModules({"x11", "xext", "xrandr"}));
+    add("x11", QCoreApplication::translate("Requirements", "X11 development files"), probe.hasModules({"x11", "xext", "xrandr"}));
   }
   if(session != SessionType::X11){
-    add("wayland", QObject::tr("PipeWire and GLib development files"),
+    add("wayland", QCoreApplication::translate("Requirements", "PipeWire and GLib development files"),
         probe.hasModules({"libpipewire-0.3", "glib-2.0", "gio-2.0", "gio-unix-2.0"}));
   }
   return list;

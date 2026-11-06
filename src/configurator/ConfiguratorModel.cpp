@@ -202,7 +202,7 @@ void ConfiguratorModel::refresh()
   };
 
   m_api.get("/api/entertainmentConfigurations", [this, done](bool ok, const QJsonDocument& doc){
-    if(ok){ applyAreas(doc.object()); } else { fail(tr("Could not load areas")); }
+    if(ok){ applyAreas(doc.object()); } else { fail(tr("Could not load entertainment areas")); }
     done();
   });
   m_api.get("/api/channels", [this, done](bool ok, const QJsonDocument& doc){
@@ -345,7 +345,7 @@ void ConfiguratorModel::selectArea(const QString& areaId)
   m_api.put("/api/setEntertainmentConfiguration", areaId, [this, areaId](bool ok, const QJsonDocument& doc){
     const auto object = doc.object();
     if(!ok || !object.value("succeeded").toBool()){
-      fail(tr("Could not switch area"));
+      fail(tr("Could not switch entertainment area"));
       return;
     }
     m_currentAreaId = areaId;

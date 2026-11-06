@@ -7,7 +7,7 @@
 
 namespace
 {
-  // Roughly 30 seconds to walk to the bridge and press the link button
+  // Roughly 30 seconds to walk to the bridge and press the pairing button
   constexpr int MaxPairAttempts = 15;
 
   // The daemon may wait on a screen sharing prompt before it serves its API again
@@ -271,7 +271,7 @@ void SetupController::tryRegister()
       setError(tr("The daemon did not answer. Try again."));
     }
     else if(reason.contains("link button", Qt::CaseInsensitive)){
-      setError(tr("The link button was not pressed in time. Press it and try again."));
+      setError(tr("The pairing button was not pressed in time. Press it and try again."));
     }
     else if(reason.contains("unreachable", Qt::CaseInsensitive)){
       setError(tr("Could not reach the bridge."));

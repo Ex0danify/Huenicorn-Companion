@@ -145,7 +145,7 @@ Flickable {
                         }
                         Text {
                             id: gammaValue
-                            text: (gamma.displayValue > 0 ? "+" : "") + gamma.displayValue.toFixed(1)
+                            text: (gamma.displayValue > 0 ? "+" : "") + gamma.displayValue.toLocaleString(Qt.locale(), "f", 1)
                             color: Theme.textDim
                             font.pixelSize: Theme.fontBody
                         }
