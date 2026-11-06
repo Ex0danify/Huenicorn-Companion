@@ -424,6 +424,10 @@
         <translation>Niedrigere Werte benötigen weniger CPU. Höhere Werte folgen feinen Details besser.</translation>
     </message>
     <message>
+        <source>Available while light sync is running.</source>
+        <translation>Verfügbar, solange der Licht-Sync läuft.</translation>
+    </message>
+    <message>
         <source>%1  %2%</source>
         <translation>%1  %2 %</translation>
     </message>

@@ -282,6 +282,48 @@ private slots:
     QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
   }
 
+  void settingsKeepTheirLayoutWithoutDaemon()
+  {
+    {
+      FakeDaemonApi api;
+      DaemonController controller;
+      controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
+      controller.setPollIntervalMs(100);
+      UpdateController updater("0.1.0");
+      DaemonInstaller installer(PinnedDaemon::current());
+      Settings settings;
+      Localization localization(settings);
+      localization.setLanguage("en");
+      AppPreferences preferences(settings);
+      ConfiguratorWindow configurator(controller, updater, installer, localization, preferences);
+
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->setProperty("tab", 3);
+      window->show();
+      QTest::qWait(100);
+
+      const auto offline = visibleTexts(window->contentItem());
+      QVERIFY(offline.contains("Capture resolution"));
+      QVERIFY(offline.contains("Interpolation"));
+      QVERIFY(offline.contains("Transition smoothing"));
+      QVERIFY(offline.contains("Available while light sync is running."));
+      QVERIFY(!offline.contains("Light sync is not running"));
+
+      controller.beginMonitoring();
+      QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
+      QTest::qWait(60);
+
+      const auto online = visibleTexts(window->contentItem());
+      QVERIFY(online.contains("Capture resolution"));
+      QVERIFY(!online.contains("Available while light sync is running."));
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
   void retranslatesLiveWithoutWarnings()
   {
     {

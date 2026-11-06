@@ -36,15 +36,12 @@ Flickable {
             }
         }
 
-        EmptyState {
-            width: parent.width
-            visible: !backend.loaded
-        }
-
+        // Same layout with or without a daemon, the skeletons give way to the real controls
         Column {
-            visible: backend.loaded
+            id: daemonSettings
             width: parent.width
             spacing: 24
+            readonly property bool ready: backend.loaded
 
             Column {
                 width: parent.width
@@ -58,10 +55,28 @@ Flickable {
                     font.pixelSize: Theme.fontSmall + 1
                     wrapMode: Text.WordWrap
                 }
+                Text {
+                    objectName: "daemonSettingsHint"
+                    width: parent.width
+                    visible: !daemonSettings.ready
+                    text: qsTr("Available while light sync is running.")
+                    color: Theme.textDim
+                    font.pixelSize: Theme.fontSmall + 1
+                    wrapMode: Text.WordWrap
+                }
 
                 Flow {
                     width: parent.width
                     spacing: 8
+
+                    Repeater {
+                        model: daemonSettings.ready ? 0 : 3
+                        delegate: Rectangle {
+                            width: 92; height: 38; radius: 19
+                            color: Theme.surfaceRaised
+                            opacity: 0.4
+                        }
+                    }
 
                     Repeater {
                         model: backend.subsampleCandidates
@@ -101,7 +116,17 @@ Flickable {
 
                 Text { text: qsTr("Interpolation"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
 
+                Rectangle {
+                    width: parent.width
+                    height: 52
+                    radius: Theme.radiusTile
+                    color: Theme.surfaceRaised
+                    opacity: 0.4
+                    visible: !daemonSettings.ready
+                }
+
                 Segmented {
+                    visible: daemonSettings.ready
                     width: parent.width
                     implicitHeight: 52
                     height: 52
@@ -126,14 +151,30 @@ Flickable {
                     }
                     Text {
                         id: smoothValue
+                        visible: daemonSettings.ready
                         text: qsTr("%1%").arg(Math.round(smooth.displayValue))
                         color: Theme.textDim
                         font.pixelSize: Theme.fontBody
                     }
                 }
 
+                Item {
+                    width: parent.width
+                    height: smooth.implicitHeight
+                    visible: !daemonSettings.ready
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width
+                        height: 14
+                        radius: 7
+                        color: Theme.surfaceRaised
+                        opacity: 0.4
+                    }
+                }
+
                 HueSlider {
                     id: smooth
+                    visible: daemonSettings.ready
                     width: parent.width
                     from: 0
                     to: 95
