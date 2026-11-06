@@ -1,0 +1,7 @@
+add_executable(TestRequirements TestRequirements.cpp)
+target_link_libraries(TestRequirements PRIVATE huenicorn_installer Qt6::Test)
+add_test(NAME Requirements COMMAND TestRequirements)
+
+add_executable(TestDaemonInstaller TestDaemonInstaller.cpp)
+target_link_libraries(TestDaemonInstaller PRIVATE huenicorn_installer test_support)
+add_test(NAME DaemonInstaller COMMAND TestDaemonInstaller)

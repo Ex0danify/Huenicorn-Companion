@@ -55,6 +55,7 @@ public slots:
 
 signals:
   void stateChanged(DaemonController::State state);
+  void daemonPathChanged();
   void logLine(const QString& line);
 
 private:

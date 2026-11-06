@@ -76,7 +76,10 @@ QString DaemonController::daemonPath() const
 
 void DaemonController::setDaemonPath(const QString& path)
 {
-  m_daemonPath = path;
+  if(m_daemonPath != path){
+    m_daemonPath = path;
+    emit daemonPathChanged();
+  }
 }
 
 

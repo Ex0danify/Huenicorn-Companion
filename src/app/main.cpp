@@ -7,6 +7,7 @@
 
 #include "configurator/ConfiguratorWindow.hpp"
 #include "daemon/DaemonController.hpp"
+#include "installer/DaemonInstaller.hpp"
 #include "settings/Settings.hpp"
 #include "tray/TrayApp.hpp"
 #include "updater/UpdateController.hpp"
@@ -43,8 +44,15 @@ int main(int argc, char* argv[])
     settings.setLastUpdateCheck(QDateTime::currentDateTime());
   });
 
+  DaemonInstaller installer(PinnedDaemon::current());
+  QObject::connect(&installer, &DaemonInstaller::installed, [&](const QString& path){
+    settings.setDaemonPath(path);
+    controller.setDaemonPath(path);
+    controller.start();
+  });
+
   TrayApp tray(controller, settings);
-  ConfiguratorWindow configurator(controller, updater);
+  ConfiguratorWindow configurator(controller, updater, installer);
   QObject::connect(&tray, &TrayApp::configuratorRequested, &configurator, &ConfiguratorWindow::show);
 
   tray.setPreQuitStep([&configurator](TrayApp::Continuation proceed){

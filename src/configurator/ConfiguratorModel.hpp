@@ -44,7 +44,7 @@ class ConfiguratorModel : public QObject
   Q_PROPERTY(QVariantList interpolations READ interpolations NOTIFY settingsChanged)
   Q_PROPERTY(int interpolation READ interpolation NOTIFY settingsChanged)
 
-  Q_PROPERTY(QString daemonPath READ daemonPath NOTIFY daemonStateChanged)
+  Q_PROPERTY(QString daemonPath READ daemonPath NOTIFY daemonPathChanged)
   Q_PROPERTY(int port READ port NOTIFY daemonStateChanged)
 
   Q_PROPERTY(SetupController* setup READ setup CONSTANT)
@@ -102,6 +102,7 @@ public:
 
 signals:
   void daemonStateChanged();
+  void daemonPathChanged();
   void loadedChanged();
   void dirtyChanged();
   void areasChanged();

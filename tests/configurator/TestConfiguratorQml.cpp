@@ -3,6 +3,7 @@
 #include <QQuickWindow>
 
 #include "FakeDaemonApi.hpp"
+#include "FakeCommandRunner.hpp"
 #include "configurator/ConfiguratorWindow.hpp"
 
 // Catches QML syntax, import and binding errors that only show up at load time
@@ -36,9 +37,11 @@ private slots:
       FakeDaemonApi api;
       DaemonController controller;
       controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
       controller.setPollIntervalMs(100);
       UpdateController updater("0.1.0");
-      ConfiguratorWindow configurator(controller, updater);
+      DaemonInstaller installer(PinnedDaemon::current());
+      ConfiguratorWindow configurator(controller, updater, installer);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -66,9 +69,11 @@ private slots:
       api.linkButtonAfter = 100000;
       DaemonController controller;
       controller.setPort(api.port());
+      controller.setDaemonPath("/usr/bin/true");
       controller.setPollIntervalMs(100);
       UpdateController updater("0.1.0");
-      ConfiguratorWindow configurator(controller, updater);
+      DaemonInstaller installer(PinnedDaemon::current());
+      ConfiguratorWindow configurator(controller, updater, installer);
 
       auto* window = configurator.window();
       QVERIFY(window != nullptr);
@@ -101,6 +106,88 @@ private slots:
       QTRY_COMPARE(setup->step(), QString("finishing"));
       QTest::qWait(60);
       QVERIFY(!window->grabWindow().isNull());
+      window->hide();
+    }
+
+    QVERIFY2(warnings().isEmpty(), qPrintable(warnings().join("\n")));
+  }
+
+  void rendersInstallPageInEveryPhase()
+  {
+    {
+      DaemonController controller;
+      UpdateController updater("0.1.0");
+
+      DaemonPin pin = PinnedDaemon::current();
+      pin.dependencies.clear();
+      DaemonInstaller installer(pin);
+
+      QTemporaryDir dir;
+      installer.setInstallDir(dir.path() + "/bin");
+      installer.setWorkRoot(dir.path() + "/work");
+      installer.setSession(SessionType::Wayland);
+      installer.setSystem({PackageKind::Rpm, {"fedora"}});
+
+      auto runnerOwner = std::make_unique<FakeRunner>();
+      auto* runner = runnerOwner.get();
+      installer.setRunner(std::move(runnerOwner));
+      bool failBuild = false;
+      runner->handler = [&](const Command& command, QString& output){
+        if(command.arguments.contains("rev-parse")){
+          output = pin.commit + "\n";
+        }
+        if(command.program == "cmake" && command.arguments.value(0) == "--build"){
+          if(failBuild){
+            output = "error: broken\n";
+            return 2;
+          }
+          QDir().mkpath(command.arguments.value(1));
+          QFile binary(command.arguments.value(1) + "/huenicorn");
+          if(binary.open(QIODevice::WriteOnly)){
+            binary.write("daemon");
+          }
+        }
+        return 0;
+      };
+
+      ConfiguratorWindow configurator(controller, updater, installer);
+      auto* window = configurator.window();
+      QVERIFY(window != nullptr);
+      window->show();
+
+      auto render = [&](const QString& phase){
+        QTRY_COMPARE(installer.phase(), phase);
+        QTest::qWait(60);
+        QVERIFY(!window->grabWindow().isNull());
+      };
+
+      HostProbe probe;
+      probe.hasTool = [](const QString& tool){ return tool != "cmake"; };
+      probe.hasModules = [](const QStringList&){ return true; };
+      probe.mbedtlsMajor = [](){ return 3; };
+      installer.setProbe(probe);
+      installer.refresh();
+      render("missing");
+
+      probe.hasTool = [](const QString&){ return true; };
+      installer.setProbe(probe);
+      installer.refresh();
+      render("ready");
+
+      runner->hang = true;
+      installer.build();
+      render("building");
+      installer.cancel();
+      render("ready");
+
+      runner->hang = false;
+      failBuild = true;
+      installer.build();
+      render("failed");
+
+      failBuild = false;
+      installer.build();
+      render("installed");
       window->hide();
     }
 
