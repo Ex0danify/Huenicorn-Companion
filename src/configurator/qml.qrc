@@ -13,6 +13,7 @@
     <file>qml/components/Toggle.qml</file>
     <file>qml/pages/ChannelRect.qml</file>
     <file>qml/pages/EmptyState.qml</file>
+    <file>qml/pages/InstallPage.qml</file>
     <file>qml/pages/LayoutPage.qml</file>
     <file>qml/pages/LightsPage.qml</file>
     <file>qml/pages/SettingsPage.qml</file>

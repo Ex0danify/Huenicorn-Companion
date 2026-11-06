@@ -4,7 +4,7 @@
 #include <QQmlError>
 #include <QQuickWindow>
 
-ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateController& updater, QObject* parent)
+ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateController& updater, DaemonInstaller& installer, QObject* parent)
   : QObject(parent)
   , m_model(controller)
 {
@@ -12,6 +12,7 @@ ConfiguratorWindow::ConfiguratorWindow(DaemonController& controller, UpdateContr
   Q_INIT_RESOURCE(qml);
   m_engine.rootContext()->setContextProperty("backend", &m_model);
   m_engine.rootContext()->setContextProperty("updater", &updater);
+  m_engine.rootContext()->setContextProperty("installer", &installer);
 }
 
 

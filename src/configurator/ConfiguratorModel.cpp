@@ -34,6 +34,7 @@ ConfiguratorModel::ConfiguratorModel(DaemonController& controller, QObject* pare
   connect(&m_saveTimer, &QTimer::timeout, this, &ConfiguratorModel::save);
 
   connect(&m_controller, &DaemonController::stateChanged, this, &ConfiguratorModel::onDaemonState);
+  connect(&m_controller, &DaemonController::daemonPathChanged, this, &ConfiguratorModel::daemonPathChanged);
   connect(&m_setup, &SetupController::modeChanged, this, [this](){
     if(m_setup.ready() && running()){
       m_api.setBaseUrl(m_controller.baseUrl());

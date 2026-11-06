@@ -23,9 +23,11 @@ int main(int argc, char* argv[])
   api.detectedBridges = {"192.168.1.20", "192.168.1.31"};
   DaemonController controller;
   controller.setPort(api.port());
+  controller.setDaemonPath("/usr/bin/true");
   controller.setPollIntervalMs(100);
   UpdateController updater("0.1.0");
-  ConfiguratorWindow configurator(controller, updater);
+  DaemonInstaller installer(PinnedDaemon::current());
+  ConfiguratorWindow configurator(controller, updater, installer);
   auto* window = configurator.window();
   window->show();
   controller.beginMonitoring();

@@ -17,6 +17,8 @@ Window {
     onVisibleChanged: if(!visible) backend.flush()
 
     property int tab: 0
+    // Nothing to talk to and nothing to start
+    readonly property bool daemonMissing: backend.daemonPath === "" && !backend.running
     property string toastText: ""
 
     // Lets tools and tests preselect a channel on the screen page
@@ -111,7 +113,7 @@ Window {
         id: content
         anchors { left: parent.left; right: parent.right; top: header.bottom; bottom: tabs.top }
         anchors.topMargin: 6
-        visible: !backend.setup.active
+        visible: !backend.setup.active && !window.daemonMissing
 
         SyncPage { anchors.fill: parent; visible: window.tab === 0 }
         LayoutPage { id: layoutPage; anchors.fill: parent; visible: window.tab === 1 }
@@ -125,11 +127,17 @@ Window {
         visible: backend.setup.active
     }
 
+    InstallPage {
+        anchors { left: parent.left; right: parent.right; top: header.bottom; bottom: parent.bottom }
+        anchors.topMargin: 6
+        visible: window.daemonMissing && !backend.setup.active
+    }
+
     Rectangle {
         id: tabs
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
         height: 112
-        visible: !backend.setup.active
+        visible: !backend.setup.active && !window.daemonMissing
         color: Theme.background
 
         Rectangle { anchors { left: parent.left; right: parent.right; top: parent.top } height: 1; color: Theme.border }
