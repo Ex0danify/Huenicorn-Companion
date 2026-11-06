@@ -439,17 +439,31 @@ void ConfiguratorModel::setChannelRect(int channelId, double x0, double y0, doub
 void ConfiguratorModel::setChannelGamma(int channelId, double gamma)
 {
   gamma = qBound(-1.0, gamma, 1.0);
+  double previous = 0.0;
+  for(const auto& entry : m_channels){
+    const auto map = entry.toMap();
+    if(map.value("channelId").toInt() == channelId){
+      previous = map.value("gamma").toDouble();
+    }
+  }
   patchChannel(channelId, {{"gamma", gamma}});
   emit channelsChanged();
 
-  m_api.put(QString("/api/setChannelGammaFactor/%1").arg(channelId), gamma, [this](bool ok, const QJsonDocument&){
-    if(ok){
+  m_api.put(QString("/api/setChannelGammaFactor/%1").arg(channelId), QJsonObject{{"gammaFactor", gamma}},
+    [this, channelId, previous](bool ok, const QJsonDocument& doc){
+      if(!ok){
+        patchChannel(channelId, {{"gamma", previous}});
+        emit channelsChanged();
+        fail(tr("Could not set gamma"));
+        return;
+      }
+      const auto applied = doc.object().value("gammaFactor");
+      if(applied.isDouble()){
+        patchChannel(channelId, {{"gamma", applied.toDouble()}});
+        emit channelsChanged();
+      }
       markDirty();
-    }
-    else{
-      fail(tr("Could not set gamma"));
-    }
-  });
+    });
 }
 
 
@@ -477,11 +491,14 @@ void ConfiguratorModel::setRefreshRate(int rate)
   if(rate == m_refreshRate){
     return;
   }
+  const int previous = m_refreshRate;
   m_refreshRate = rate;
   emit settingsChanged();
 
-  m_api.put("/api/setRefreshRate", rate, [this](bool ok, const QJsonDocument& doc){
+  m_api.put("/api/setRefreshRate", rate, [this, previous](bool ok, const QJsonDocument& doc){
     if(!ok){
+      m_refreshRate = previous;
+      emit settingsChanged();
       fail(tr("Could not set refresh rate"));
       return;
     }
@@ -497,16 +514,20 @@ void ConfiguratorModel::setInterpolation(int interpolation)
   if(interpolation == m_interpolation){
     return;
   }
+  const int previous = m_interpolation;
   m_interpolation = interpolation;
   emit settingsChanged();
 
-  m_api.put("/api/setInterpolation", interpolation, [this](bool ok, const QJsonDocument&){
-    if(ok){
-      markDirty();
-    }
-    else{
+  m_api.put("/api/setInterpolation", interpolation, [this, previous](bool ok, const QJsonDocument& doc){
+    if(!ok){
+      m_interpolation = previous;
+      emit settingsChanged();
       fail(tr("Could not set interpolation"));
+      return;
     }
+    m_interpolation = doc.object().value("interpolation").toInt(m_interpolation);
+    emit settingsChanged();
+    markDirty();
   });
 }
 
@@ -517,16 +538,20 @@ void ConfiguratorModel::setSmoothing(double percent)
   if(qFuzzyCompare(percent + 1, m_smoothing + 1)){
     return;
   }
+  const double previous = m_smoothing;
   m_smoothing = percent;
   emit settingsChanged();
 
-  m_api.put("/api/setTransitionSmoothing", percent, [this](bool ok, const QJsonDocument&){
-    if(ok){
-      markDirty();
-    }
-    else{
+  m_api.put("/api/setTransitionSmoothing", percent, [this, previous](bool ok, const QJsonDocument& doc){
+    if(!ok){
+      m_smoothing = previous;
+      emit settingsChanged();
       fail(tr("Could not set smoothing"));
+      return;
     }
+    m_smoothing = doc.object().value("transitionSmoothing").toDouble(m_smoothing);
+    emit settingsChanged();
+    markDirty();
   });
 }
 

@@ -38,6 +38,7 @@ public:
   QList<Request> requests;
   int stopRequests{0};
   bool failSaves{false};
+  QStringList failPaths;          // requests to these paths answer 500 without touching state
 
   // Setup mode mimics a daemon without a bridge: a reduced API, everything else is a 404
   bool setupMode{false};
@@ -141,8 +142,9 @@ private:
     }
 
     m_notFound = false;
-    const auto body = route(request);
-    const bool fail = failSaves && request.path == "/api/saveProfile";
+    const bool forced = failPaths.contains(request.path);
+    const auto body = forced ? QByteArray("{}") : route(request);
+    const bool fail = forced || (failSaves && request.path == "/api/saveProfile");
     const char* status = m_notFound ? "HTTP/1.1 404 Not Found" : (fail ? "HTTP/1.1 500 Internal Server Error" : "HTTP/1.1 200 OK");
     socket->write(QByteArray(status) + "\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: "
       + QByteArray::number(body.size()) + "\r\n\r\n" + body);
@@ -235,7 +237,7 @@ private:
         ch->insert("gammaFactor", bodyDoc.toObject().value("gammaFactor"));
         commitScratch();
       }
-      return json(QJsonObject{{"succeeded", true}});
+      return json(QJsonObject{{"gammaFactor", bodyDoc.toObject().value("gammaFactor")}, {"succeeded", true}});
     }
     if(p == "/api/setSubsampleWidth"){
       return json(QJsonObject{{"x", 2560}, {"y", 1440}, {"subsampleWidth", bodyDoc.toInt()}});
