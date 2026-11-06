@@ -9,16 +9,6 @@ Flickable {
     clip: true
     boundsBehavior: Flickable.StopAtBounds
 
-    function averageGamma() {
-        const list = backend.channels
-        if (list.length === 0)
-            return 0
-        let sum = 0
-        for (const channel of list)
-            sum += channel.gamma
-        return sum / list.length
-    }
-
     Column {
         id: column
         x: Theme.gutter
@@ -39,56 +29,6 @@ Flickable {
         EmptyState {
             width: parent.width
             visible: !backend.loaded
-        }
-
-        Card {
-            objectName: "globalGammaCard"
-            visible: backend.loaded && backend.channels.length > 0
-            width: parent.width
-            height: 76 + 28 + 1
-
-            Row {
-                id: globalHeader
-                height: 76
-                anchors { left: parent.left; right: parent.right; leftMargin: 20; rightMargin: 20 }
-                spacing: 14
-
-                Rectangle {
-                    width: 40; height: 40; radius: 20
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.surfaceRaised
-                    Icon { anchors.centerIn: parent; kind: "bulb"; color: Theme.text }
-                }
-
-                Column {
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        text: qsTr("All lights")
-                        color: Theme.text
-                        font.pixelSize: Theme.fontBody + 1
-                        font.bold: true
-                    }
-                    Text {
-                        text: qsTr("Gamma")
-                        color: Theme.textDim
-                        font.pixelSize: Theme.fontSmall + 1
-                    }
-                }
-            }
-
-            HueSlider {
-                id: globalGamma
-                objectName: "globalGamma"
-                anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: 1 }
-                trackHeight: 28
-                knobSize: 22
-                barRadius: Theme.radiusCard - 1
-                from: -1
-                to: 1
-                stepSize: 0.1
-                value: page.averageGamma()
-                onCommitted: (v) => backend.setAllChannelsGamma(v)
-            }
         }
 
         Repeater {

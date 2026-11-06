@@ -301,16 +301,8 @@
         <translation>%1 von %2 synchronisiert</translation>
     </message>
     <message>
-        <source>All lights</source>
-        <translation>Alle Lichter</translation>
-    </message>
-    <message>
         <source>Channel %1</source>
         <translation>Kanal %1</translation>
-    </message>
-    <message>
-        <source>Gamma</source>
-        <translation>Gamma</translation>
     </message>
 </context>
 <context>
