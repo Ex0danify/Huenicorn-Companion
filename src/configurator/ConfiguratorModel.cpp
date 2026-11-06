@@ -89,6 +89,7 @@ bool ConfiguratorModel::busy() const
 
 QString ConfiguratorModel::version() const { return m_controller.version(); }
 bool ConfiguratorModel::loaded() const { return m_loaded; }
+bool ConfiguratorModel::hasLoaded() const { return m_hasLoaded; }
 bool ConfiguratorModel::dirty() const { return m_dirty; }
 bool ConfiguratorModel::saving() const { return m_saving || m_saveTimer.isActive(); }
 QVariantList ConfiguratorModel::areas() const { return m_areas; }
@@ -170,6 +171,7 @@ void ConfiguratorModel::setLoaded(bool loaded)
 {
   if(m_loaded != loaded){
     m_loaded = loaded;
+    m_hasLoaded = m_hasLoaded || loaded;
     emit loadedChanged();
   }
 }

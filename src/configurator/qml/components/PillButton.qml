@@ -15,7 +15,7 @@ Rectangle {
     implicitHeight: 56
     radius: height / 2
     opacity: enabled ? 1 : 0.45
-    color: area.pressed ? Qt.darker(fill, 1.15) : (area.containsMouse ? Qt.lighter(fill, 1.08) : fill)
+    color: !enabled ? fill : (area.pressed ? Qt.darker(fill, 1.15) : (area.containsMouse ? Qt.lighter(fill, 1.08) : fill))
     Behavior on color { ColorAnimation { duration: 120 } }
 
     Text {
@@ -31,7 +31,7 @@ Rectangle {
         id: area
         anchors.fill: parent
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         onClicked: root.clicked()
     }
 }

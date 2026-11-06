@@ -24,6 +24,8 @@ class ConfiguratorModel : public QObject
   Q_PROPERTY(bool busy READ busy NOTIFY daemonStateChanged)
   Q_PROPERTY(QString version READ version NOTIFY daemonStateChanged)
   Q_PROPERTY(bool loaded READ loaded NOTIFY loadedChanged)
+  // True once real values arrived, they stay available after the daemon stops
+  Q_PROPERTY(bool hasLoaded READ hasLoaded NOTIFY loadedChanged)
   Q_PROPERTY(bool dirty READ dirty NOTIFY dirtyChanged)
   Q_PROPERTY(bool saving READ saving NOTIFY dirtyChanged)
 
@@ -60,6 +62,7 @@ public:
   bool busy() const;
   QString version() const;
   bool loaded() const;
+  bool hasLoaded() const;
   bool dirty() const;
   bool saving() const;
 
@@ -137,6 +140,7 @@ private:
   SetupController m_setup;
 
   bool m_loaded{false};
+  bool m_hasLoaded{false};
   bool m_dirty{false};
   int m_pending{0};
   bool m_saving{false};

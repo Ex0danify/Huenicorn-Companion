@@ -1,5 +1,7 @@
 #include <QtTest>
 
+#include <algorithm>
+
 #include <QQuickItem>
 #include <QQuickView>
 #include <QQuickWindow>
@@ -304,20 +306,68 @@ private slots:
       window->show();
       QTest::qWait(100);
 
-      const auto offline = visibleTexts(window->contentItem());
+      auto hasChips = [](const QStringList& texts){
+        return std::any_of(texts.begin(), texts.end(), [](const QString& t){ return t.contains(u'\u00d7'); });
+      };
+      auto root = [&](){ return window->contentItem(); };
+      const QString hint = "Available while light sync is running.";
+
+      // Never connected: headings and the hint, but only empty placeholders
+      const auto offline = visibleTexts(root());
       QVERIFY(offline.contains("Capture resolution"));
       QVERIFY(offline.contains("Interpolation"));
       QVERIFY(offline.contains("Transition smoothing"));
-      QVERIFY(offline.contains("Available while light sync is running."));
+      QVERIFY(offline.contains(hint));
       QVERIFY(!offline.contains("Light sync is not running"));
+      QVERIFY(!hasChips(offline));
+      QVERIFY(!configurator.model().hasLoaded());
 
       controller.beginMonitoring();
       QTRY_VERIFY_WITH_TIMEOUT(configurator.model().loaded(), 5000);
       QTest::qWait(60);
 
-      const auto online = visibleTexts(window->contentItem());
-      QVERIFY(online.contains("Capture resolution"));
-      QVERIFY(!online.contains("Available while light sync is running."));
+      const auto online = visibleTexts(root());
+      QVERIFY(!online.contains(hint));
+      QVERIFY(hasChips(online));
+      QVERIFY(itemByName(root(), "resolutionChips")->isEnabled());
+      QVERIFY(itemByName(root(), "interpolationTiles")->isEnabled());
+      QVERIFY(itemByName(root(), "smoothingSlider")->isEnabled());
+
+      // Hovering a resolution chip lights it up while the daemon runs, and not afterwards
+      auto hoverColor = [&](){
+        auto* flow = itemByName(root(), "resolutionChips");
+        QQuickItem* chip = nullptr;
+        for(auto* child : flow->childItems()){
+          if(child->property("modelData").isValid() && !child->property("selected").toBool()){
+            chip = child;
+            break;
+          }
+        }
+        if(chip == nullptr){
+          return QColor();
+        }
+        QTest::mouseMove(window, QPoint(2, 2));
+        QTest::qWait(200);
+        QTest::mouseMove(window, chip->mapToScene(QPointF(chip->width() / 2, chip->height() / 2)).toPoint());
+        QTest::qWait(250);
+        return chip->property("color").value<QColor>();
+      };
+      const QColor lit = hoverColor();
+      QVERIFY(lit.isValid());
+      QCOMPARE(lit, QColor("#353a43"));
+
+      // After the daemon stops the last readings stay visible but can no longer be changed
+      api.close();
+      QTRY_VERIFY_WITH_TIMEOUT(!configurator.model().running(), 5000);
+      QTest::qWait(60);
+      const auto stopped = visibleTexts(root());
+      QVERIFY(stopped.contains(hint));
+      QVERIFY(hasChips(stopped));
+      QVERIFY(configurator.model().hasLoaded());
+      QVERIFY(!itemByName(root(), "resolutionChips")->isEnabled());
+      QVERIFY(!itemByName(root(), "interpolationTiles")->isEnabled());
+      QVERIFY(!itemByName(root(), "smoothingSlider")->isEnabled());
+      QCOMPARE(hoverColor(), QColor("#262a31"));
       window->hide();
     }
 
@@ -420,7 +470,7 @@ private slots:
       // Clicking elsewhere closes an open list without changing anything
       QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, center);
       QTRY_COMPARE(dropdown->property("open").toBool(), true);
-      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, QPoint(window->width() - 8, center.y() + 300));
+      QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, QPoint(100, center.y() - 90));
       QTRY_COMPARE(dropdown->property("open").toBool(), false);
       QCOMPARE(localization.active(), QString("de"));
 

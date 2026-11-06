@@ -37,172 +37,190 @@ Flickable {
         }
 
         // Same layout with or without a daemon, the skeletons give way to the real controls
-        Column {
-            id: daemonSettings
+        Card {
             width: parent.width
-            spacing: 24
-            readonly property bool ready: backend.loaded
-
-            Card {
-                objectName: "daemonSettingsHint"
-                width: parent.width
-                height: hintText.implicitHeight + 28
-                raised: true
-                visible: !daemonSettings.ready
-
-                Text {
-                    id: hintText
-                    anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 18 }
-                    text: qsTr("Available while light sync is running.")
-                    color: Theme.text
-                    font.pixelSize: Theme.fontBody
-                    wrapMode: Text.WordWrap
-                }
-            }
+            height: daemonSettings.height + 44
 
             Column {
-                width: parent.width
-                spacing: 12
+                id: daemonSettings
+                x: 22; y: 22
+                width: parent.width - 44
+                spacing: 24
+                readonly property bool ready: backend.loaded
+                // Values stay on screen, greyed out, once the daemon reported them
+                readonly property bool showValues: backend.hasLoaded
 
-                Text { text: qsTr("Capture resolution"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
-                Text {
+                Column {
+                    objectName: "daemonSettingsHint"
                     width: parent.width
-                    text: qsTr("Lower values use less CPU. Higher values follow fine detail better.")
-                    color: Theme.textDim
-                    font.pixelSize: Theme.fontSmall + 1
-                    wrapMode: Text.WordWrap
-                }
-                Flow {
-                    width: parent.width
-                    spacing: 8
-
-                    Repeater {
-                        model: daemonSettings.ready ? 0 : 3
-                        delegate: Rectangle {
-                            width: 92; height: 38; radius: 19
-                            color: Theme.surfaceRaised
-                            opacity: 0.5
-                            Text { anchors.centerIn: parent; text: "—"; color: Theme.textDim; font.pixelSize: Theme.fontSmall + 1 }
-                        }
-                    }
-
-                    Repeater {
-                        model: backend.subsampleCandidates
-                        delegate: Rectangle {
-                            id: chip
-                            required property var modelData
-                            readonly property bool selected: modelData.width === backend.subsampleWidth
-                            width: chipText.implicitWidth + 28
-                            height: 38
-                            radius: 19
-                            color: selected ? "white" : (chipArea.containsMouse ? Theme.surfaceHover : Theme.surfaceRaised)
-                            Behavior on color { ColorAnimation { duration: 120 } }
-
-                            Text {
-                                id: chipText
-                                anchors.centerIn: parent
-                                text: qsTr("%1  %2%").arg(chip.modelData.label).arg(chip.modelData.percent)
-                                color: chip.selected ? "#14181d" : Theme.textDim
-                                font.pixelSize: Theme.fontSmall + 1
-                                font.bold: chip.selected
-                            }
-                            MouseArea {
-                                id: chipArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: backend.setSubsampleWidth(chip.modelData.width)
-                            }
-                        }
-                    }
-                }
-            }
-
-            Column {
-                width: parent.width
-                spacing: 12
-
-                Text { text: qsTr("Interpolation"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
-
-                Row {
-                    id: segmentSkeleton
-                    width: parent.width
-                    spacing: 8
+                    spacing: 12
                     visible: !daemonSettings.ready
-                    opacity: 0.5
 
-                    Repeater {
-                        model: 3
-                        delegate: Rectangle {
-                            width: (segmentSkeleton.width - 2 * segmentSkeleton.spacing) / 3
-                            height: 52
-                            radius: Theme.radiusTile
-                            color: Theme.surfaceRaised
-                            Text { anchors.centerIn: parent; text: "—"; color: Theme.textDim; font.pixelSize: Theme.fontBody }
-                        }
-                    }
-                }
-
-                Segmented {
-                    visible: daemonSettings.ready
-                    width: parent.width
-                    implicitHeight: 52
-                    height: 52
-                    model: backend.interpolations.map(function (i) { return { label: i.name, value: i.value } })
-                    current: backend.interpolation
-                    onPicked: (value) => backend.setInterpolation(value)
-                }
-            }
-
-            Column {
-                width: parent.width
-                spacing: 8
-
-                Row {
-                    width: parent.width
                     Text {
-                        width: parent.width - smoothValue.width
-                        text: qsTr("Transition smoothing")
-                        color: Theme.text
-                        font.pixelSize: Theme.fontBody
-                        font.bold: true
-                    }
-                    Text {
-                        id: smoothValue
-                        visible: daemonSettings.ready
-                        text: qsTr("%1%").arg(Math.round(smooth.displayValue))
-                        color: Theme.textDim
-                        font.pixelSize: Theme.fontBody
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: smooth.implicitHeight
-                    visible: !daemonSettings.ready
-                    Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
                         width: parent.width
-                        height: 14
-                        radius: 7
-                        opacity: 0.35
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-                            GradientStop { position: 0; color: Theme.accentDeep }
-                            GradientStop { position: 1; color: "#e8f1fa" }
+                        text: qsTr("Available while light sync is running.")
+                        color: Theme.textDim
+                        font.pixelSize: Theme.fontSmall + 1
+                        font.italic: true
+                        wrapMode: Text.WordWrap
+                    }
+                    Rectangle { width: parent.width; height: 1; color: Theme.border }
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: 12
+
+                    Text { text: qsTr("Capture resolution"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
+                    Text {
+                        width: parent.width
+                        text: qsTr("Lower values use less CPU. Higher values follow fine detail better.")
+                        color: Theme.textDim
+                        font.pixelSize: Theme.fontSmall + 1
+                        wrapMode: Text.WordWrap
+                    }
+                    Flow {
+                        objectName: "resolutionChips"
+                        width: parent.width
+                        spacing: 8
+                        enabled: daemonSettings.ready
+                        opacity: enabled || !daemonSettings.showValues ? 1 : 0.4
+
+                        Repeater {
+                            model: daemonSettings.showValues ? 0 : 3
+                            delegate: Rectangle {
+                                width: 92; height: 38; radius: 19
+                                color: Theme.surfaceRaised
+                                opacity: 0.5
+                                Text { anchors.centerIn: parent; text: "—"; color: Theme.textDim; font.pixelSize: Theme.fontSmall + 1 }
+                            }
+                        }
+
+                        Repeater {
+                            model: backend.subsampleCandidates
+                            delegate: Rectangle {
+                                id: chip
+                                required property var modelData
+                                readonly property bool selected: modelData.width === backend.subsampleWidth
+                                width: chipText.implicitWidth + 28
+                                height: 38
+                                radius: 19
+                                color: selected ? "white" : (chipArea.containsMouse && chip.enabled ? Theme.surfaceHover : Theme.surfaceRaised)
+                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                Text {
+                                    id: chipText
+                                    anchors.centerIn: parent
+                                    text: qsTr("%1  %2%").arg(chip.modelData.label).arg(chip.modelData.percent)
+                                    color: chip.selected ? "#14181d" : Theme.textDim
+                                    font.pixelSize: Theme.fontSmall + 1
+                                    font.bold: chip.selected
+                                }
+                                MouseArea {
+                                    id: chipArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: chip.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    onClicked: backend.setSubsampleWidth(chip.modelData.width)
+                                }
+                            }
                         }
                     }
                 }
 
-                HueSlider {
-                    id: smooth
-                    visible: daemonSettings.ready
+                Column {
                     width: parent.width
-                    from: 0
-                    to: 95
-                    stepSize: 1
-                    value: backend.smoothing
-                    onCommitted: (v) => backend.setSmoothing(v)
+                    spacing: 12
+
+                    Text { text: qsTr("Interpolation"); color: Theme.text; font.pixelSize: Theme.fontBody; font.bold: true }
+
+                    Row {
+                        id: segmentSkeleton
+                        width: parent.width
+                        spacing: 8
+                        visible: !daemonSettings.showValues
+                        opacity: 0.5
+
+                        Repeater {
+                            model: 3
+                            delegate: Rectangle {
+                                width: (segmentSkeleton.width - 2 * segmentSkeleton.spacing) / 3
+                                height: 52
+                                radius: Theme.radiusTile
+                                color: Theme.surfaceRaised
+                                Text { anchors.centerIn: parent; text: "—"; color: Theme.textDim; font.pixelSize: Theme.fontBody }
+                            }
+                        }
+                    }
+
+                    Segmented {
+                        objectName: "interpolationTiles"
+                        visible: daemonSettings.showValues
+                        enabled: daemonSettings.ready
+                        opacity: enabled ? 1 : 0.4
+                        tileColor: Theme.surfaceRaised
+                        width: parent.width
+                        implicitHeight: 52
+                        height: 52
+                        model: backend.interpolations.map(function (i) { return { label: i.name, value: i.value } })
+                        current: backend.interpolation
+                        onPicked: (value) => backend.setInterpolation(value)
+                    }
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: 8
+
+                    Row {
+                        width: parent.width
+                        Text {
+                            width: parent.width - smoothValue.width
+                            text: qsTr("Transition smoothing")
+                            color: Theme.text
+                            font.pixelSize: Theme.fontBody
+                            font.bold: true
+                        }
+                        Text {
+                            id: smoothValue
+                            visible: daemonSettings.showValues
+                            opacity: daemonSettings.ready ? 1 : 0.4
+                            text: qsTr("%1%").arg(Math.round(smooth.displayValue))
+                            color: Theme.textDim
+                            font.pixelSize: Theme.fontBody
+                        }
+                    }
+
+                    Item {
+                        width: parent.width
+                        height: smooth.implicitHeight
+                        visible: !daemonSettings.showValues
+                        Rectangle {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            height: 14
+                            radius: 7
+                            opacity: 0.35
+                            gradient: Gradient {
+                                orientation: Gradient.Horizontal
+                                GradientStop { position: 0; color: Theme.accentDeep }
+                                GradientStop { position: 1; color: "#e8f1fa" }
+                            }
+                        }
+                    }
+
+                    HueSlider {
+                        id: smooth
+                        objectName: "smoothingSlider"
+                        visible: daemonSettings.showValues
+                        enabled: daemonSettings.ready
+                        width: parent.width
+                        from: 0
+                        to: 95
+                        stepSize: 1
+                        value: backend.smoothing
+                        onCommitted: (v) => backend.setSmoothing(v)
+                    }
                 }
             }
         }
