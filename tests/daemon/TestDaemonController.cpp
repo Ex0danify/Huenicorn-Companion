@@ -8,7 +8,7 @@
 
 namespace
 {
-  bool waitForState(DaemonController& controller, DaemonController::State state, int ms = 5000)
+  bool waitForState(const DaemonController& controller, DaemonController::State state, int ms = 5000)
   {
     QElapsedTimer timer;
     timer.start();
@@ -25,7 +25,7 @@ class TestDaemonController : public QObject
   Q_OBJECT
 
 private slots:
-  void adoptsExternalDaemon()
+  void adoptsExternalDaemon() const
   {
     FakeDaemonApi api;
     DaemonController controller;
@@ -38,7 +38,7 @@ private slots:
     QVERIFY(!controller.ownsProcess());
   }
 
-  void externalDaemonDisappearing()
+  void externalDaemonDisappearing() const
   {
     auto api = std::make_unique<FakeDaemonApi>();
     DaemonController controller;
@@ -51,7 +51,7 @@ private slots:
     QVERIFY(waitForState(controller, DaemonController::State::Stopped));
   }
 
-  void stopSendsStopRequestToExternalDaemon()
+  void stopSendsStopRequestToExternalDaemon() const
   {
     FakeDaemonApi api;
     DaemonController controller;
@@ -68,7 +68,7 @@ private slots:
     QVERIFY(waitForState(controller, DaemonController::State::Stopped));
   }
 
-  void startWithoutBinaryFails()
+  void startWithoutBinaryFails() const
   {
     DaemonController controller;
     controller.start();
@@ -76,7 +76,7 @@ private slots:
     QVERIFY(!controller.lastError().isEmpty());
   }
 
-  void missingBinaryFailsWithoutSpawning()
+  void missingBinaryFailsWithoutSpawning() const
   {
     DaemonController controller;
     controller.setDaemonPath("/nonexistent/huenicorn");
@@ -86,7 +86,7 @@ private slots:
     QVERIFY(!controller.ownsProcess());
   }
 
-  void canStartNeedsAnExistingExecutable()
+  void canStartNeedsAnExistingExecutable() const
   {
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
@@ -105,7 +105,7 @@ private slots:
     QVERIFY(controller.canStart());
   }
 
-  void binaryOnlyChangesWhileStopped()
+  void binaryOnlyChangesWhileStopped() const
   {
     FakeDaemonApi api;
     DaemonController controller;
@@ -129,7 +129,7 @@ private slots:
     QVERIFY(failing.canChangeBinary());
   }
 
-  void checkNowAdoptsExternalDaemonWithoutWaiting()
+  void checkNowAdoptsExternalDaemonWithoutWaiting() const
   {
     FakeDaemonApi api;
     DaemonController controller;
@@ -139,7 +139,7 @@ private slots:
     QVERIFY(waitForState(controller, DaemonController::State::Running));
   }
 
-  void ownedProcessLifecycle()
+  void ownedProcessLifecycle() const
   {
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
@@ -158,7 +158,7 @@ private slots:
     controller.setStopTimeoutMs(500);
 
     QStringList lines;
-    connect(&controller, &DaemonController::logLine, this, [&](const QString& line){ lines << line; });
+    connect(&controller, &DaemonController::logLine, this, [&lines](const QString& line){ lines << line; });
 
     controller.start();
     QCOMPARE(controller.state(), DaemonController::State::Starting);
@@ -170,13 +170,48 @@ private slots:
     // It keeps answering polls, so the controller may re-adopt it right after Stopped.
     // Record the transitions instead of sampling the current state.
     QList<DaemonController::State> states;
-    connect(&controller, &DaemonController::stateChanged, this, [&](DaemonController::State state){ states << state; });
+    connect(&controller, &DaemonController::stateChanged, this, [&states](DaemonController::State state){ states << state; });
     controller.stop();
     QTRY_VERIFY_WITH_TIMEOUT(states.contains(DaemonController::State::Stopped), 5000);
     QVERIFY(!controller.ownsProcess());
   }
 
-  void unexpectedExitIsAnError()
+  void daemonGetsNoOpBrowserLauncher() const
+  {
+    QStandardPaths::setTestModeEnabled(true);
+    const QString stub = QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/nobrowser/xdg-open";
+    QFile::remove(stub);
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const auto script = dir.filePath("fake-daemon.sh");
+    QFile file(script);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write("#!/bin/sh\necho \"opener=$(command -v xdg-open)\"\nxdg-open http://127.0.0.1:1\necho \"exit=$?\"\nexec sleep 60\n");
+    file.close();
+    file.setPermissions(file.permissions() | QFileDevice::ExeOwner);
+
+    FakeDaemonApi api;
+    DaemonController controller;
+    controller.setDaemonPath(script);
+    controller.setPort(api.port());
+    controller.setPollIntervalMs(100);
+    controller.setStopTimeoutMs(500);
+
+    QStringList lines;
+    connect(&controller, &DaemonController::logLine, this, [&lines](const QString& line){ lines << line; });
+
+    controller.start();
+    QTRY_VERIFY_WITH_TIMEOUT(lines.contains("exit=0"), 3000);
+    QVERIFY(lines.contains("opener=" + stub));
+    QVERIFY(QFileInfo(stub).isExecutable());
+
+    controller.stop();
+    QVERIFY(waitForState(controller, DaemonController::State::Stopped, 5000));
+    QStandardPaths::setTestModeEnabled(false);
+  }
+
+  void unexpectedExitIsAnError() const
   {
     QTemporaryDir dir;
     const auto script = dir.filePath("crash.sh");
