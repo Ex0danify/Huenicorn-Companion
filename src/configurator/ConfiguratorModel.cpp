@@ -159,6 +159,7 @@ void ConfiguratorModel::clear()
   m_dirty = false;
   m_resave = false;
   m_saveTimer.stop();
+  m_refreshGen++;
   setLoaded(false);
   emit areasChanged();
   emit channelsChanged();
@@ -197,8 +198,13 @@ void ConfiguratorModel::refresh()
     return;
   }
 
+  // Replies of a superseded refresh must neither apply data nor count down
+  const auto gen = ++m_refreshGen;
   m_pending = 4;
-  auto done = [this](){
+  auto done = [this, gen](){
+    if(gen != m_refreshGen){
+      return;
+    }
     if(--m_pending == 0){
       // A reload after a failed request must not drop a save that is still owed
       if(!m_loaded){
@@ -210,19 +216,23 @@ void ConfiguratorModel::refresh()
     }
   };
 
-  m_api.get("/api/entertainmentConfigurations", [this, done](bool ok, const QJsonDocument& doc){
+  m_api.get("/api/entertainmentConfigurations", [this, gen, done](bool ok, const QJsonDocument& doc){
+    if(gen != m_refreshGen){ return; }
     if(ok){ applyAreas(doc.object()); } else { fail(tr("Could not load entertainment areas")); }
     done();
   });
-  m_api.get("/api/channels", [this, done](bool ok, const QJsonDocument& doc){
+  m_api.get("/api/channels", [this, gen, done](bool ok, const QJsonDocument& doc){
+    if(gen != m_refreshGen){ return; }
     if(ok){ applyChannels(doc.array()); } else { fail(tr("Could not load channels")); }
     done();
   });
-  m_api.get("/api/displayInfo", [this, done](bool ok, const QJsonDocument& doc){
+  m_api.get("/api/displayInfo", [this, gen, done](bool ok, const QJsonDocument& doc){
+    if(gen != m_refreshGen){ return; }
     if(ok){ applyDisplay(doc.object()); } else { fail(tr("Could not load display info")); }
     done();
   });
-  m_api.get("/api/interpolationInfo", [this, done](bool ok, const QJsonDocument& doc){
+  m_api.get("/api/interpolationInfo", [this, gen, done](bool ok, const QJsonDocument& doc){
+    if(gen != m_refreshGen){ return; }
     if(ok){ applyInterpolation(doc.object()); } else { fail(tr("Could not load interpolation info")); }
     done();
   });

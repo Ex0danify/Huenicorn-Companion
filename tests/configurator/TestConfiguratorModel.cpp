@@ -55,6 +55,30 @@ private slots:
     QCOMPARE(f.channel(0).value("name").toString(), QString("Ceiling Spot 1"));
   }
 
+  void overlappingRefreshWaitsForTheLatestReplies()
+  {
+    Fixture f;
+    int areaUpdates = 0;
+    int areaUpdatesWhenLoaded = -1;
+    bool restarted = false;
+    connect(f.model.get(), &ConfiguratorModel::areasChanged, this, [&](){
+      areaUpdates++;
+      if(!restarted){
+        restarted = true;
+        f.model->refresh();
+      }
+    });
+    connect(f.model.get(), &ConfiguratorModel::loadedChanged, this, [&](){
+      areaUpdatesWhenLoaded = areaUpdates;
+    });
+
+    QTRY_VERIFY(f.model->loaded());
+    // The restarted refresh applies its own areas before the model counts as loaded
+    QCOMPARE(areaUpdatesWhenLoaded, 2);
+    QTest::qWait(200);
+    QCOMPARE(areaUpdates, 2);
+  }
+
   void doesNotLoadWhileTheDaemonIsInSetup()
   {
     Fixture f(true);
