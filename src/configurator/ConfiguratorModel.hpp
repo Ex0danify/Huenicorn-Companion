@@ -143,6 +143,7 @@ private:
   bool m_hasLoaded{false};
   bool m_dirty{false};
   int m_pending{0};
+  quint64 m_refreshGen{0};
   bool m_saving{false};
   bool m_resave{false};
   QTimer m_saveTimer;
