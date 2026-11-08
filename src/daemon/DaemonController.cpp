@@ -1,7 +1,10 @@
 #include "daemon/DaemonController.hpp"
 
+#include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QJsonObject>
+#include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QUrl>
 
@@ -9,6 +12,26 @@ namespace
 {
   // A few missed polls in a row before a running daemon counts as gone
   constexpr int MaxMissedPolls = 2;
+
+  // The daemon opens its web UI and setup wizard via xdg-open and has no option to
+  // disable that. The companion covers both, so put a no-op xdg-open first on its PATH.
+  QString noBrowserDir()
+  {
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/nobrowser";
+    const QString stub = dir + "/xdg-open";
+    if(QFileInfo(stub).isExecutable()){
+      return dir;
+    }
+
+    QFile file(stub);
+    if(!QDir().mkpath(dir) || !file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
+      return {};
+    }
+    file.write("#!/bin/sh\nexit 0\n");
+    file.close();
+    file.setPermissions(file.permissions() | QFileDevice::ExeOwner | QFileDevice::ExeGroup | QFileDevice::ExeOther);
+    return dir;
+  }
 }
 
 
@@ -168,8 +191,7 @@ void DaemonController::start()
   setState(State::Starting);
 
   // The daemon logs through a block-buffered stdout when piped, so force line buffering
-  const auto stdbuf = QStandardPaths::findExecutable("stdbuf");
-  if(stdbuf.isEmpty()){
+  if(const auto stdbuf = QStandardPaths::findExecutable("stdbuf"); stdbuf.isEmpty()){
     m_process.setProgram(m_daemonPath);
     m_process.setArguments({});
   }
@@ -177,6 +199,12 @@ void DaemonController::start()
     m_process.setProgram(stdbuf);
     m_process.setArguments({"-oL", "-eL", m_daemonPath});
   }
+  auto environment = QProcessEnvironment::systemEnvironment();
+  if(const auto stubDir = noBrowserDir(); !stubDir.isEmpty()){
+    environment.insert("PATH", stubDir + ":" + environment.value("PATH"));
+  }
+  m_process.setProcessEnvironment(environment);
+
   m_process.start();
   m_startTimer.start(m_startTimeoutMs);
 
@@ -188,16 +216,18 @@ void DaemonController::start()
 
 void DaemonController::stop()
 {
-  if(m_state == State::Stopped || m_state == State::Stopping){
+  using enum State;
+
+  if(m_state == Stopped || m_state == Stopping){
     return;
   }
 
-  if(m_state == State::Error && !ownsProcess()){
-    setState(State::Stopped);
+  if(m_state == Error && !ownsProcess()){
+    setState(Stopped);
     return;
   }
 
-  setState(State::Stopping);
+  setState(Stopping);
   m_startTimer.stop();
   m_stopTimer.start(m_stopTimeoutMs);
   requestRemoteStop();
@@ -252,23 +282,28 @@ void DaemonController::poll()
 
 void DaemonController::onPollReply(bool reachable, const QString& version)
 {
+  using enum State;
+
   if(reachable){
     m_missedPolls = 0;
     m_version = version;
     m_startTimer.stop();
 
-    if(m_state == State::Stopped || m_state == State::Starting || m_state == State::Error){
+    if(m_state == Stopped || m_state == Starting || m_state == Error){
       // Also adopts a daemon someone else started
       m_lastError.clear();
-      setState(State::Running);
+      setState(Running);
     }
     return;
   }
 
-  if(m_state == State::Running && !ownsProcess()){
-    if(++m_missedPolls >= MaxMissedPolls){
-      setState(State::Stopped);
-    }
+  if(m_state != Running || ownsProcess()){
+    return;
+  }
+
+  ++m_missedPolls;
+  if(m_missedPolls >= MaxMissedPolls){
+    setState(Stopped);
   }
 }
 
